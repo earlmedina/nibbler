@@ -6,7 +6,7 @@ constexpr int SCREEN_WIDTH = 800;
 constexpr int SCREEN_HEIGHT = 450;
 constexpr int TARGET_FPS = 60;
 
-enum class Screen { StartMenu, Options, Gameplay, GameOver };
+enum class Screen { StartMenu, Instructions, Options, Gameplay, GameOver };
 
 // Struct used for drawing menu items
 struct MenuItem {
@@ -92,6 +92,10 @@ int main() {
                             break;
                         }
                         case 1: {
+                            currentScreen = Screen::Instructions;
+                            break;
+                        }
+                        case 2: {
                             currentScreen = Screen::Options;
                             break;
                         }
