@@ -1,5 +1,6 @@
 #include <raylib.h>
 #include <string>
+#include <vector>
 
 constexpr int SCREEN_WIDTH = 800;
 constexpr int SCREEN_HEIGHT = 450;
@@ -50,19 +51,67 @@ void SetMenuItemRects(std::vector<MenuItem> &menuItems) {
 
 int main() {
     const char *title = "Nibbler";
+    const int menuFontSize = 30;
+
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, title);
     SetTargetFPS(TARGET_FPS);
-
     Screen currentScreen = Screen::StartMenu; // Set start screen to Start Menu
 
-    while (WindowShouldClose() == false) {
+    // Create array to store start menu options
+    std::vector<MenuItem> menuItems = {
+    {"Start Game", {}},
+    {"Options", {}},
+    {"Quit", {}}
+    };
+
+    // Set rect values
+    SetMenuItemRects(menuItems);
+    int selectedItem = 0; // By default, first item is selected.
+
+    bool quitGame = false;
+    while (!WindowShouldClose() && !quitGame) {
+        // Update
+        //----------------------------------------------------------------------------------
+        // Conditionally handle updates by screen as seen in example: https://www.raylib.com/examples/core/loader.html?name=core_basic_screen_manager
+        switch (currentScreen) {
+            case Screen::StartMenu: {
+                // Allow Up navigations with Up or W keys
+                if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
+                    selectedItem = (selectedItem - 1 + (int)menuItems.size()) % (int)menuItems.size(); // Wraparound if before start
+
+                // Allow Down navigations with Down or S keys
+                if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S))
+                    selectedItem = (selectedItem + 1) % (int)menuItems.size(); // Wraparound if past end
+
+                // Handle User selection
+                if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)) {
+                    switch (selectedItem) {
+                        case 0: {
+                            currentScreen = Screen::Gameplay;
+                            break;
+                        }
+                        case 1: {
+                            currentScreen = Screen::Options;
+                            break;
+                        }
+                        case 2: {
+                            quitGame = true;
+                            break;
+                        }
+                    }
+                }
+
+
+            }
+        }
+
 
         // Draw
         //----------------------------------------------------------------------------------
         BeginDrawing();
         ClearBackground({ 20, 24, 36, 255 }); // Change background to dark blue
 
-        // Conditionally render screen
+        // Conditionally render screen as seen in example: https://www.raylib.com/examples/core/loader.html?name=core_basic_screen_manager
         switch (currentScreen) {
             case Screen::StartMenu: {
                 DrawCenteredText(title, 80, 60, SKYBLUE, true);
