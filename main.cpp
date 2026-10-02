@@ -59,7 +59,8 @@ int main() {
 
     // Create array to store start menu options
     std::vector<MenuItem> menuItems = {
-    {"Start Game", {}},
+    {"Play", {}},
+    {"How to Play", {}},
     {"Options", {}},
     {"Quit", {}}
     };
