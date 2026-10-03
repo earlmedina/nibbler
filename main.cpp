@@ -17,11 +17,11 @@ struct MenuItem {
 
 /**
  *  * Helper function used to draw centered text
- * @param text
- * @param y
- * @param fontSize
- * @param color
- * @param effect - TextEffect enum
+ * @param text      - Text to draw
+ * @param y         - Y position on screen
+ * @param fontSize  - Text font size
+ * @param color     - Text color
+ * @param effect    - TextEffect enum
  */
 void DrawCenteredText(const char *text, int y, int fontSize, Color color, TextEffect effect = TextEffect::None) {
     int textWidth = MeasureText(text, fontSize);
@@ -64,7 +64,6 @@ void SetMenuItemRects(std::vector<MenuItem> &menuItems) {
 
 int main() {
     const char *title = "Nibbler";
-    const int menuFontSize = 30;
 
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, title);
     SetTargetFPS(TARGET_FPS);
@@ -138,6 +137,10 @@ int main() {
                 if (IsKeyPressed(KEY_ESCAPE) || IsKeyPressed(KEY_BACKSPACE))
                     currentScreen = Screen::StartMenu;
             } break;
+            case Screen::GameOver: {
+                if (IsKeyPressed(KEY_ESCAPE))
+                    quitGame = true;
+            } break;
         }
 
         // Draw
@@ -159,6 +162,7 @@ int main() {
                 Color selectedMenuItemColor = { 255, 200, 0, 60 };
 
                 for (size_t i = 0; i < menuItems.size(); i++) {
+                    constexpr int menuFontSize = 30;
                     Rectangle r = menuItems[i].rect;
                     bool isSelected = static_cast<int>(i) == selectedItem;
 
