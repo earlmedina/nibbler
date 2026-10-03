@@ -140,7 +140,6 @@ int main() {
             } break;
         }
 
-
         // Draw
         //----------------------------------------------------------------------------------
         BeginDrawing();
@@ -149,9 +148,62 @@ int main() {
         // Conditionally render screen as seen in example: https://www.raylib.com/examples/core/loader.html?name=core_basic_screen_manager
         switch (currentScreen) {
             case Screen::StartMenu: {
-                DrawCenteredText(title, 80, 60, SKYBLUE, true);
-                DrawCenteredText("A snake game made with raylib", 155, 20, LIGHTGRAY);
-            }
+                float t = static_cast<float>(GetTime());
+
+                // Draw title and subtitle
+                DrawCenteredText(title, 60, 60, SKYBLUE, TextEffect::Bob);
+                DrawCenteredText("A snake game made with raylib", 130, 20, LIGHTGRAY);
+
+                // Draw menu items
+                Color baseMenuItemColor = { 255, 255, 255, 15 };
+                Color selectedMenuItemColor = { 255, 200, 0, 60 };
+
+                for (size_t i = 0; i < menuItems.size(); i++) {
+                    Rectangle r = menuItems[i].rect;
+                    bool isSelected = static_cast<int>(i) == selectedItem;
+
+                    // Draw menu item container
+                    DrawRectangleRounded(r, 0.5f, 10,
+                        isSelected ? selectedMenuItemColor : baseMenuItemColor);
+
+                    // Draw menu item text
+                    int textWidth = MeasureText(menuItems[i].label.c_str(), menuFontSize);
+                    DrawText(menuItems[i].label.c_str(),
+                        static_cast<int>(r.x + (r.width - textWidth) / 2),
+                        static_cast<int>(r.y + (r.height - menuFontSize) / 2),
+                        menuFontSize,
+                        isSelected ? GOLD : RAYWHITE);
+                }
+
+                // Show flashing help text
+                DrawCenteredText("Use Up/Down arrow keys or W/S to select - ENTER to select",
+                    (SCREEN_HEIGHT - 30), 18, LIGHTGRAY, TextEffect::Blink);
+            } break;
+
+            case Screen::Instructions: {
+                // Draw directions
+                DrawText("Movement", 100, 20, 50,  GOLD);
+                DrawText("Use arrow or WASD keys to navigate the snake", 100, 90, 20,  RAYWHITE);
+                DrawText("Objectives", 100, 150, 50,  GOLD);
+                DrawText("* Collect food to earn points", 100, 220, 20,  RAYWHITE);
+                DrawText("* Do your best to avoid colliding with yourself or walls", 100, 260, 20,  RAYWHITE);
+
+                // Draw flashing help text
+                DrawCenteredText("Press ESC to return to Start Menu",
+                    (SCREEN_HEIGHT - 30), 18,  LIGHTGRAY);
+            } break;
+
+            case Screen::Options: {
+
+            } break;
+
+            case Screen::Gameplay: {
+
+            } break;
+
+            case Screen::GameOver: {
+
+            } break;
         }
         EndDrawing();
     }
