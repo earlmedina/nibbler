@@ -31,7 +31,7 @@ void DrawCenteredText(const char *text, int y, int fontSize, Color color, TextEf
         // Approach modified from: https://stackoverflow.com/questions/67322860/how-do-i-make-a-simple-idle-bobbing-motion-animation
         // The general idea is to apply a sine wave to the Y position to make it bob
         case TextEffect::Bob: {
-            int transformation = (int)(sinf(t * 2.0f) * 6.0f);
+            int transformation = static_cast<int>(sinf(t * 2.0f) * 6.0f);
             DrawText(text, (SCREEN_WIDTH - textWidth) / 2, y + transformation, fontSize, color);
         } break;
         case TextEffect::Blink: {
@@ -57,7 +57,7 @@ void SetMenuItemRects(std::vector<MenuItem> &menuItems) {
     const float itemWidth = 260.0f;
     const float itemHeight = 44.0f;
     for (size_t i = 0; i < menuItems.size(); i++ ) {
-        menuItems[i].rect = { (SCREEN_WIDTH - itemWidth) / 2.0f, 230.0f + i * 55.0f, itemWidth, itemHeight };
+        menuItems[i].rect = { (SCREEN_WIDTH - itemWidth) / 2.0f, 190.0f + i * 55.0f, itemWidth, itemHeight };
     }
 }
 
@@ -92,11 +92,11 @@ int main() {
             case Screen::StartMenu: {
                 // Allow Up navigations with Up or W keys
                 if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
-                    selectedItem = (selectedItem - 1 + (int)menuItems.size()) % (int)menuItems.size(); // Wraparound if before start
+                    selectedItem = (selectedItem - 1 + static_cast<int>(menuItems.size())) % static_cast<int>(menuItems.size()); // Wraparound if before start
 
                 // Allow Down navigations with Down or S keys
                 if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S))
-                    selectedItem = (selectedItem + 1) % (int)menuItems.size(); // Wraparound if past end
+                    selectedItem = (selectedItem + 1) % static_cast<int>(menuItems.size()); // Wraparound if past end
 
                 // Handle User selection
                 if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)) {
