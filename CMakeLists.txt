@@ -1,5 +1,6 @@
 # CMakeLists.txt for Raylib projects
 # Credit: https://gist.github.com/erikyuzwa/98305851fc6f948805a92768c7e82705
+# Used this approach because it's a much easier and consistent way to set up raylib
 
 cmake_minimum_required(VERSION 4.3)
 project(nibbler)
