@@ -68,6 +68,7 @@ int main() {
 
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, title);
     SetTargetFPS(TARGET_FPS);
+    SetExitKey(KEY_NULL); // Override default
     Screen currentScreen = Screen::StartMenu; // Set start screen to Start Menu
 
     // Create array to store start menu options
@@ -112,15 +113,31 @@ int main() {
                             currentScreen = Screen::Options;
                             break;
                         }
-                        case 2: {
+                        case 3: {
                             quitGame = true;
                             break;
                         }
                     }
                 }
+            } break;
 
+            case Screen::Gameplay: {
+                // Placeholder
+                if (IsKeyPressed(KEY_ESCAPE) || IsKeyPressed(KEY_BACKSPACE))
+                    currentScreen = Screen::StartMenu;
+            } break;
 
-            }
+            case Screen::Instructions: {
+                // Placeholder
+                if (IsKeyPressed(KEY_ESCAPE) || IsKeyPressed(KEY_BACKSPACE))
+                    currentScreen = Screen::StartMenu;
+            } break;
+
+            case Screen::Options: {
+                // Placeholder
+                if (IsKeyPressed(KEY_ESCAPE) || IsKeyPressed(KEY_BACKSPACE))
+                    currentScreen = Screen::StartMenu;
+            } break;
         }
 
 
