@@ -7,6 +7,7 @@ constexpr int SCREEN_HEIGHT = 450;
 constexpr int TARGET_FPS = 60;
 
 enum class Screen { StartMenu, Instructions, Options, Gameplay, GameOver };
+enum class TextEffect { None, Bob, Blink };
 
 // Struct used for drawing menu items
 struct MenuItem {
@@ -20,20 +21,32 @@ struct MenuItem {
  * @param y
  * @param fontSize
  * @param color
- * @param addBobEffect
+ * @param effect - TextEffect enum
  */
-void DrawCenteredText(const char *text, int y, int fontSize, Color color, bool addBobEffect = false) {
+void DrawCenteredText(const char *text, int y, int fontSize, Color color, TextEffect effect = TextEffect::None) {
     int textWidth = MeasureText(text, fontSize);
-    if (addBobEffect) {
+    const auto t = static_cast<float>(GetTime()); // Needs to be cast to float for sinf
+    switch (effect) {
         // Draw text using bobbing effect
         // Approach modified from: https://stackoverflow.com/questions/67322860/how-do-i-make-a-simple-idle-bobbing-motion-animation
         // The general idea is to apply a sine wave to the Y position to make it bob
-        float t = static_cast<float>(GetTime()); // Needs to be cast to float for sinf
-        int transformation = (int)(sinf(t * 2.0f) * 6.0f);
-        DrawText(text, (SCREEN_WIDTH - textWidth) / 2, y + transformation, fontSize, color);
+        case TextEffect::Bob: {
+            int transformation = (int)(sinf(t * 2.0f) * 6.0f);
+            DrawText(text, (SCREEN_WIDTH - textWidth) / 2, y + transformation, fontSize, color);
+        } break;
+        case TextEffect::Blink: {
+            // Show flashing/blinking text
+            // Adapted from this libgdx example: https://gamedev.stackexchange.com/questions/150504/how-to-make-a-sprite-blink-with-libgdx
+            // and using Fade function: https://www.raylib.com/cheatsheet/cheatsheet.html
+            float alpha = (sinf(t * 1.7f) * 0.5f) + 0.5f;
+            DrawText(text, (SCREEN_WIDTH - textWidth) / 2, y, fontSize, Fade(color, alpha));
+        } break;
+            // Intentional fallthrough
+        case TextEffect::None:
+        default:
+            DrawText(text, (SCREEN_WIDTH - textWidth) / 2, y, fontSize, color);
+            break;
     }
-    else
-        DrawText(text, (SCREEN_WIDTH - textWidth) / 2, y, fontSize, color);
 }
 
 /**
