@@ -6,6 +6,11 @@ constexpr int SCREEN_WIDTH = 800;
 constexpr int SCREEN_HEIGHT = 450;
 constexpr int TARGET_FPS = 60;
 
+// Grid Constants
+constexpr int CELL_SIZE = 20;
+constexpr int COLS = SCREEN_WIDTH / CELL_SIZE;
+constexpr int ROWS = SCREEN_HEIGHT / CELL_SIZE;
+
 enum class Screen { StartMenu, Instructions, Options, Gameplay, GameOver };
 enum class TextEffect { None, Bob, Blink };
 
@@ -14,6 +19,58 @@ struct MenuItem {
     std::string label;
     Rectangle rect;
 };
+
+// Struct used for grid cells
+struct Cell {
+    int x;
+    int y;
+
+    /*
+     * Overload operators for simpler comparison:
+     * https://www.learncpp.com/cpp-tutorial/overloading-operators-using-member-functions/
+     */
+
+    // Overload + to make it easier to find new snake position
+    Cell operator+ (Cell other) const {
+        return { x + other.x, y + other.y} ;
+    }
+
+    // Overload == to make cell comparison easier
+    bool operator== (Cell other) const {
+        return x == other.x && y == other.y;
+    }
+
+    // Overload != to make cell comparison easier
+    bool operator!= (Cell other) const {
+        return x != other.x || y != other.y;
+    }
+
+    // Get Rectangle representation of cell
+    Rectangle ToRect(Cell c, int cellSize) const {
+        return {
+            float(x * cellSize),
+            float(y * cellSize),
+            float(cellSize),
+            float(cellSize)
+        };
+    }
+
+    // Check if cell is within specified bounds
+    bool WithinBounds(int right, int bottom, int left = 0, int top = 0) const {
+        return x >= left && x < right && y >= top && y < bottom;
+    }
+};
+
+// Direction constants used to simplify turning logic
+// Namespace used here as a static class would be used in other languages:
+// https://www.learncpp.com/cpp-tutorial/user-defined-namespaces-and-the-scope-resolution-operator/
+namespace Direction {
+    constexpr Cell Up = { 0, -1 };
+    constexpr Cell Down = { 0, 1 };
+    constexpr Cell Left = { -1, 0 };
+    constexpr Cell Right = { 1, 0 };
+}
+
 
 /**
  *  * Helper function used to draw centered text
