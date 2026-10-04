@@ -21,6 +21,7 @@ struct MenuItem {
 };
 
 // Struct used for grid cells
+// Note: depends on CELL_SIZE, COLS, and ROWS constants
 struct Cell {
     int x;
     int y;
@@ -46,18 +47,18 @@ struct Cell {
     }
 
     // Get Rectangle representation of cell
-    Rectangle ToRect(Cell c, int cellSize) const {
+    Rectangle ToRect() const {
         return {
-            float(x * cellSize),
-            float(y * cellSize),
-            float(cellSize),
-            float(cellSize)
+            float(x * CELL_SIZE),
+            float(y * CELL_SIZE),
+            float(CELL_SIZE),
+            float(CELL_SIZE)
         };
     }
 
     // Check if cell is within specified bounds
-    bool WithinBounds(int right, int bottom, int left = 0, int top = 0) const {
-        return x >= left && x < right && y >= top && y < bottom;
+    bool WithinBounds() const {
+        return x >= 0 && x < COLS && y >= 0 && y < ROWS;
     }
 };
 
