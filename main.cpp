@@ -73,6 +73,8 @@ namespace Direction {
     constexpr Cell Right = { 1, 0 };
 }
 
+// Note: used this CodeLogic video to get a general sense of how Snake movement logic
+// should work in a Snake game: https://www.youtube.com/watch?v=dZF0zseLcY0
 class Snake {
 public:
     // Constructor
@@ -105,7 +107,7 @@ public:
 
         // All max 3 turns in queue: if under, then add the new direction
         if (turnQueue.size() < 3)
-            turnQueue.push_front(newDirection);
+            turnQueue.push_back(newDirection);
     }
 
 private:
