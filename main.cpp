@@ -1,3 +1,4 @@
+#include <deque>
 #include <raylib.h>
 #include <string>
 #include <vector>
@@ -72,6 +73,48 @@ namespace Direction {
     constexpr Cell Right = { 1, 0 };
 }
 
+class Snake {
+public:
+    // Constructor
+    Snake() {
+        // Snake should reset to default on init
+        Reset();
+    }
+
+    // Method used to return Snake attributes to default
+    void Reset() {
+        body.clear(); // Clear body deque
+        turnQueue.clear(); // Clear any pending turns
+
+        // By default, Snake will be moving right from the top left corner
+        body.push_back({0, 0});
+        currentDirection = Direction::Right;
+        canTurn = false;
+        isGrowing = false;
+    }
+
+    // Queue a turn which is checked against the turnQueue to determine whether it's valid:
+    // - no reversing   - no same direction
+    void Turn(const Cell newDirection) {
+        // Get last direction - if the queue is empty it's the current direction otherwise the last move
+        const Cell lastTurn = turnQueue.empty() ? currentDirection : turnQueue.back();
+
+        // The last direction is the same or rerverse of the current one, do nothing.
+        if (newDirection == lastTurn || (currentDirection.x == -lastTurn.x && currentDirection.y == -lastTurn.y))
+            return;
+
+        // All max 3 turns in queue: if under, then add the new direction
+        if (turnQueue.size() < 3)
+            turnQueue.push_front(newDirection);
+    }
+
+private:
+    std::deque<Cell> body; // Deque data structure used to track snake body
+    std::deque<Cell> turnQueue; // Deque data structure used to queue snake turns (used to prevent collisions caused by reverse moment)
+    Cell currentDirection; // The current direction of movement
+    bool canTurn = false; // Whether or not the snake can turn (e.g., a reverse direction is forbidden)
+    bool isGrowing = false; // Flag used to denote whether or not the snake is growing (has just eaten food)
+};
 
 /**
  *  * Helper function used to draw centered text
