@@ -79,8 +79,6 @@ namespace Direction {
     constexpr Cell Right = { 1, 0 };
 }
 
-// Note: used this CodeLogic video to get a general sense of how Snake movement logic
-// should work in a Snake game: https://www.youtube.com/watch?v=dZF0zseLcY0
 class Snake {
 public:
     // Constructor
@@ -123,6 +121,8 @@ public:
 
     /**
      * Perform a movement based on turnQueue or current direction (if empty)
+    *  Note: used this CodeLogic video to get a general sense of how Snake movement logic
+    *  should work in a Snake game: https://www.youtube.com/watch?v=dZF0zseLcY0
      * @return false if there's a collision, true otherwise
      */
     bool Move() {
