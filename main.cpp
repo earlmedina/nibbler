@@ -182,10 +182,12 @@ public:
     /**
      * Helper function that checks if the snake's body contains a cell.
      * Used to determine where to spawn food.
+     * Note: written as const member function because we don't want to modify the snake:
+     * https://www.learncpp.com/cpp-tutorial/const-class-objects-and-const-member-functions/
      * @param cell - the Cell to check
      * @return true if the snake occupies the cell, false otherwise.
      */
-    bool Contains(const Cell cell) {
+    bool Contains(Cell cell) const {
         // std::find "returns an iterator to the first element in the source range [first, last)
         // that satisfies specific criteria (or last if there is no such iterator)."
         // https://cppreference.com/cpp/algorithm/find
@@ -206,6 +208,42 @@ private:
     Cell currentDirection; // The current direction of movement
     bool canTurn = false; // Whether or not the snake can turn (e.g., a reverse direction is forbidden)
     bool isGrowing = false; // Flag used to denote whether or not the snake is growing (has just eaten food)
+};
+
+class Food {
+public:
+    Cell Position() const {
+        return position;
+    }
+
+    /**
+     * Spawn food in new location
+     * @param snake - Snake object by reference
+     * @return boolean value indicating whether the spawn was successful
+     */
+    bool Spawn(const Snake &snake) {
+        // Handle highly unlikely edge case: player has covered grid with snake body
+        if (snake.Length() >= COLS * ROWS) {
+            return false;
+        }
+
+        // Keep spawning until a valid location is found
+        do {
+            position = { GetRandomValue(0, COLS - 1), GetRandomValue(0, ROWS - 1) };
+        } while (snake.Contains(position));
+        return true;
+    }
+
+    void Draw() const {
+        // Need to get centerpoint from rect to draw circle in correct location
+        Rectangle r = position.ToRect();
+        int centerX = static_cast<int>(r.x + r.width / 2); // r is float so need to cast to int
+        int centerY = static_cast<int>(r.y + r.height / 2);
+        DrawCircle(centerX, centerY, CELL_SIZE * 0.5f, MAROON);
+    }
+
+private:
+    Cell position;
 };
 
 /**
