@@ -47,7 +47,10 @@ struct Cell {
         return x != other.x || y != other.y;
     }
 
-    // Get Rectangle representation of cell
+    /**
+     * Get Rectangle representation of cell
+     * @return cell as Rectangle
+     */
     Rectangle ToRect() const {
         return {
             float(x * CELL_SIZE),
@@ -57,7 +60,10 @@ struct Cell {
         };
     }
 
-    // Check if cell is within specified bounds
+    /**
+     * Check if cell is within specified bounds
+     * @return true if within bounds, false if not
+     */
     bool WithinBounds() const {
         return x >= 0 && x < COLS && y >= 0 && y < ROWS;
     }
@@ -83,7 +89,9 @@ public:
         Reset();
     }
 
-    // Method used to return Snake attributes to default
+    /**
+     * Method used to return Snake attributes to default
+     */
     void Reset() {
         body.clear(); // Clear body deque
         turnQueue.clear(); // Clear any pending turns
@@ -95,9 +103,12 @@ public:
         isGrowing = false;
     }
 
-    // Queue a turn which is checked against the turnQueue to determine whether it's valid:
-    // - no reversing   - no same direction
-    void Turn(const Cell newDirection) {
+    /**
+    * Queue a turn which is checked against the turnQueue to determine whether it's valid:
+    *   - no reversing   - no same direction
+     * @param newDirection - the next cell to move to
+     */
+    void QueueTurn(const Cell newDirection) {
         // Get last direction - if the queue is empty it's the current direction otherwise the last move
         const Cell lastTurn = turnQueue.empty() ? currentDirection : turnQueue.back();
 
