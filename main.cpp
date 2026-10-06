@@ -87,6 +87,10 @@ public:
         Reset();
     }
 
+    /** Attributes **/
+    Cell Head() const { return body.front(); }
+    size_t Length() const { return body.size(); }
+
     /**
      * Method used to return Snake attributes to default
      */
@@ -187,10 +191,6 @@ public:
         // https://cppreference.com/cpp/algorithm/find
         return std::find(body.begin(), body.end(), cell) != body.end(); // If the find result is body.end(), the snake doesn't contain the cell!
     }
-
-    /** Convenience functions **/
-    Cell Head() const { return body.front(); }
-    size_t Length() const { return body.size(); }
 
     // Draw the snake
     void Draw() const {
