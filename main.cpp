@@ -121,6 +121,85 @@ public:
             turnQueue.push_back(newDirection);
     }
 
+    /**
+     * Perform a movement based on turnQueue or current direction (if empty)
+     * @return false if there's a collision, true otherwise
+     */
+    bool Move() {
+        // If the turnQueue is not empty, then set currentDirection to next queued direction and pop
+        // (Otherwise, there's no queued turns and we simply move in the current direction
+        if (!turnQueue.empty()) {
+            currentDirection = turnQueue.front();
+            turnQueue.pop_front();
+        }
+
+        // For movement, we determine what the new head will be
+        const Cell nextHead = Head() + currentDirection;
+
+        /********* Collision Checks *********/
+        // Body Collision:
+        // For this check, we need to know what the next tail position will be:
+        // - Case 1: the second to last position if the snake has not eaten (and we pop the current tail)
+        // - Case 2: the last position if the snake has eaten
+        const size_t nextTailPos = isGrowing ? body.size() - 1 : body.size() - 2;
+
+        // Check new head position against body (limit by tail position)
+        bool collidesBody = false;
+        for (size_t i = 0; i <= nextTailPos; i++) {
+            if (body[i] == nextHead) {
+                collidesBody = true;
+                break;
+            }
+        }
+
+        // If the next head is not within bounds (collides with wall) or collides with the body, return false
+        if (!nextHead.WithinBounds() || collidesBody)
+            return false;
+
+        // Otherwise, push next head to front
+        body.push_front(nextHead);
+
+        // And, pop tail if necessary
+        if (isGrowing)
+            isGrowing = false;
+        else
+            body.pop_back();
+
+        return true; // return true for legal move
+    }
+
+    /**
+     * Set isGrowing flag to true
+     */
+    void Grow() {
+        isGrowing = true;
+    }
+
+    /**
+     * Helper function that checks if the snake's body contains a cell.
+     * Used to determine where to spawn food.
+     * @param cell - the Cell to check
+     * @return true if the snake occupies the cell, false otherwise.
+     */
+    bool Contains(const Cell cell) {
+        // std::find "returns an iterator to the first element in the source range [first, last)
+        // that satisfies specific criteria (or last if there is no such iterator)."
+        // https://cppreference.com/cpp/algorithm/find
+        return std::find(body.begin(), body.end(), cell) != body.end(); // If the find result is body.end(), the snake doesn't contain the cell!
+    }
+
+    /** Convenience functions **/
+    Cell Head() const { return body.front(); }
+    size_t Length() const { return body.size(); }
+
+    // Draw the snake
+    void Draw() const {
+        for (size_t i = 0; i < body.size(); i++) {
+            const Color color = i == 0 ? LIME : DARKGREEN;
+            DrawRectangleRounded(body[i].ToRect(), 0.4f, 6, color);
+        }
+    }
+
 private:
     std::deque<Cell> body; // Deque data structure used to track snake body
     std::deque<Cell> turnQueue; // Deque data structure used to queue snake turns (used to prevent collisions caused by reverse moment)
