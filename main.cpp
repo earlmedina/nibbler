@@ -156,7 +156,6 @@ public:
         // By default, Snake will be moving right from the top left corner
         body.push_back({0, 0});
         currentDirection = Direction::Right;
-        canTurn = false;
         isGrowing = false;
     }
 
@@ -170,7 +169,7 @@ public:
         const Cell lastTurn = turnQueue.empty() ? currentDirection : turnQueue.back();
 
         // The last direction is the same or rerverse of the current one, do nothing.
-        if (newDirection == lastTurn || (currentDirection.x == -lastTurn.x && currentDirection.y == -lastTurn.y))
+        if (newDirection == lastTurn || (newDirection.x == -lastTurn.x && newDirection.y == -lastTurn.y))
             return;
 
         // All max 3 turns in queue: if under, then add the new direction
@@ -197,14 +196,14 @@ public:
 
         /********* Collision Checks *********/
         // Body Collision:
-        // For this check, we need to know what the next tail position will be:
-        // - Case 1: the second to last position if the snake has not eaten (and we pop the current tail)
-        // - Case 2: the last position if the snake has eaten
-        const size_t nextTailPos = isGrowing ? body.size() - 1 : body.size() - 2;
+        // For this check, we need to know what the next body size will be
+        // - Case 1: The snake has not eaten, so we pop the tail and use body size minus 1
+        // - Case 2: The snake has eaten, so the tail is not popped and the full body size is used
+        const size_t newBodySize = isGrowing ? body.size() : body.size() - 1;
 
-        // Check new head position against body (limit by tail position)
+        // Check new head position against body
         bool collidesBody = false;
-        for (size_t i = 0; i <= nextTailPos; i++) {
+        for (size_t i = 0; i <= newBodySize; i++) {
             if (body[i] == nextHead) {
                 collidesBody = true;
                 break;
