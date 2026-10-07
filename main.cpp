@@ -141,6 +141,25 @@ void SetMenuItemRects(std::vector<MenuItem> &menuItems) {
     }
 }
 
+void DrawMenuItems(std::vector<MenuItem> &menuItems, int selectedMenuItem) {
+    for (size_t i = 0; i < menuItems.size(); i++) {
+        Rectangle r = menuItems[i].rect;
+        bool isSelected = static_cast<int>(i) == selectedMenuItem;
+
+        // Draw menu item container
+        DrawRectangleRounded(r, 0.5f, 10,
+            isSelected ? MENU_ITEM_SELECTED_COLOR : MENU_ITEM_BASE_COLOR);
+
+        // Draw menu item text
+        int textWidth = MeasureText(menuItems[i].label.c_str(), MENU_FONT_SIZE);
+        DrawText(menuItems[i].label.c_str(),
+            static_cast<int>(r.x + (r.width - textWidth) / 2),
+            static_cast<int>(r.y + (r.height - MENU_FONT_SIZE) / 2),
+            MENU_FONT_SIZE,
+            isSelected ? MENU_ITEM_SELECTED_TEXT_COLOR : MENU_ITEM_BASE_TEXT_COLOR);
+    }
+}
+
 class Snake {
 public:
     // Constructor
@@ -579,22 +598,8 @@ int main() {
                 DrawCenteredText(title, 60, 60, SKYBLUE, TextEffect::Bob);
                 DrawCenteredText("A snake game made with raylib", 130, 20, LIGHTGRAY);
 
-                for (size_t i = 0; i < startMenuItems.size(); i++) {
-                    Rectangle r = startMenuItems[i].rect;
-                    bool isSelected = static_cast<int>(i) == selectedStartMenuItem;
-
-                    // Draw menu item container
-                    DrawRectangleRounded(r, 0.5f, 10,
-                        isSelected ? MENU_ITEM_SELECTED_COLOR : MENU_ITEM_BASE_COLOR);
-
-                    // Draw menu item text
-                    int textWidth = MeasureText(startMenuItems[i].label.c_str(), MENU_FONT_SIZE);
-                    DrawText(startMenuItems[i].label.c_str(),
-                        static_cast<int>(r.x + (r.width - textWidth) / 2),
-                        static_cast<int>(r.y + (r.height - MENU_FONT_SIZE) / 2),
-                        MENU_FONT_SIZE,
-                        isSelected ? MENU_ITEM_SELECTED_TEXT_COLOR : MENU_ITEM_BASE_TEXT_COLOR);
-                }
+                // Draw menu items
+                DrawMenuItems(startMenuItems, selectedStartMenuItem);
 
                 // Show flashing help text
                 DrawCenteredText("Use Up/Down arrow keys or W/S to select - ENTER to select",
@@ -633,24 +638,10 @@ int main() {
             } break;
 
             case Screen::QuitPrompt: {
-                DrawCenteredText("Quit Game?", 120, 48, GOLD);
+                DrawCenteredText("Quit Game?", 130, 48, GOLD);
 
-                for (size_t i = 0; i < quitPromptItems.size(); i++) {
-                    Rectangle r = quitPromptItems[i].rect;
-                    bool isSelected = static_cast<int>(i) == quitPromptSelectedItem;
-
-                    // Draw menu item container
-                    DrawRectangleRounded(r, 0.5f, 10,
-                        isSelected ? MENU_ITEM_SELECTED_COLOR : MENU_ITEM_BASE_COLOR);
-
-                    // Draw menu item text
-                    int textWidth = MeasureText(quitPromptItems[i].label.c_str(), MENU_FONT_SIZE);
-                    DrawText(quitPromptItems[i].label.c_str(),
-                        static_cast<int>(r.x + (r.width - textWidth) / 2),
-                        static_cast<int>(r.y + (r.height - MENU_FONT_SIZE) / 2),
-                        MENU_FONT_SIZE,
-                        isSelected ? MENU_ITEM_SELECTED_TEXT_COLOR : MENU_ITEM_BASE_TEXT_COLOR);
-                }
+                // Draw menu items
+                DrawMenuItems(quitPromptItems, quitPromptSelectedItem);
             } break;
         }
         EndDrawing();
