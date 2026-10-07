@@ -28,7 +28,7 @@ constexpr float INITIAL_STEP_INTERVAL = 0.15f; // Time between drawing steps (hi
 constexpr float FOOD_SPEED_BOOST = 0.005f; // Time subtracted from current step time after food is eaten (to make snake go slightly faster and make the game increasingly difficult)
 constexpr float MIN_STEP_INTERVAL = 0.05f; // The minimum time between drawing steps (determines the snake's max speed)
 
-enum class Screen { StartMenu, Instructions, Options, Gameplay, GameOver };
+enum class Screen { StartMenu, Instructions, Options, Gameplay, GameOver, QuitPrompt };
 enum class TextEffect { None, Bob, Blink };
 
 // Struct used for drawing menu items
@@ -210,7 +210,7 @@ public:
 
         // Check new head position against body
         bool collidesBody = false;
-        for (size_t i = 0; i <= newBodySize; i++) {
+        for (size_t i = 0; i < newBodySize; i++) {
             if (body[i] == nextHead) {
                 collidesBody = true;
                 break;
@@ -445,9 +445,25 @@ int main() {
     SetMenuItemRects(startMenuItems);
     int selectedStartMenuItem = 0; // By default, first item is selected.
 
+    /*** Quit Prompt ***/
+    // constexpr float quitItemWidth = 140.0f;
+    // constexpr float quitItemHeight = 40.0f;
+    // constexpr float quitItemStartX = (SCREEN_WIDTH - (2 * quitItemWidth)) / 2;
+    // constexpr float quitItemStartY = 230.0f;
+    // std::vector<MenuItem> quitPromptItems = {
+    //     {"Yes", {quitItemStartX, quitItemStartY, quitItemWidth, quitItemHeight } },
+    //     {"No", {quitItemStartX, quitItemStartY + quitItemHeight + 30.0f, quitItemWidth, quitItemHeight } }
+    // };
+    std::vector<MenuItem> quitPromptItems = {
+        {"Yes", {} },
+        {"No", {} }
+    };
+    SetMenuItemRects(quitPromptItems);
+    int quitPromptSelectedItem = 1;
+
+    /*** Game Vars ***/
     int highScore = 0; /***** placeholder *******/
     bool quitGame = false;
-
     Game game; // Init game
 
     while (!WindowShouldClose() && !quitGame) {
@@ -484,7 +500,8 @@ int main() {
                             break;
                         }
                         case 3: {
-                            quitGame = true;
+                            quitPromptSelectedItem = 1;
+                            currentScreen = Screen::QuitPrompt;
                             break;
                         }
                     }
@@ -519,15 +536,34 @@ int main() {
                 if (IsKeyPressed(KEY_ESCAPE) || IsKeyPressed(KEY_BACKSPACE))
                     currentScreen = Screen::StartMenu;
             } break;
+
             case Screen::GameOver: {
                 if (IsKeyPressed(KEY_ENTER)) {
                     game.NewGame();
                     currentScreen = Screen::Gameplay;
                 }
-                if (IsKeyPressed(KEY_BACKSPACE))
-                    currentScreen = Screen::StartMenu;
                 if (IsKeyPressed(KEY_ESCAPE))
-                    quitGame = true;
+                    currentScreen = Screen::StartMenu;
+                // if (IsKeyPressed(KEY_ESCAPE))
+                //     quitGame = true;
+            } break;
+
+            case Screen::QuitPrompt: {
+                // Allow Up navigations with Up or W keys
+                if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
+                    quitPromptSelectedItem = (quitPromptSelectedItem - 1 + 2) % 2; // Wraparound
+
+                // Allow Down navigations with Down or S keys
+                if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S))
+                    quitPromptSelectedItem = (quitPromptSelectedItem + 1) % 2; // Wraparound
+
+                // Handle User selection
+                if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)) {
+                    if (quitPromptSelectedItem == 0)
+                        quitGame = true;
+                    else
+                        currentScreen = Screen::StartMenu;
+                }
             } break;
         }
 
@@ -592,8 +628,29 @@ int main() {
                 DrawCenteredText("GAME OVER", 100, 64, RED);
                 DrawCenteredText(TextFormat("Score: %d    High Score: %d", game.Score(), highScore), 184, 24, LIGHTGRAY);
                 DrawCenteredText("Press Enter to Play Again", 260, 28, RAYWHITE, TextEffect::Blink);
-                DrawCenteredText("Press BackSpace to Return to Start Menu", 305, 20, GRAY);
-                DrawCenteredText("Press Esc to Quit Game", 350, 20, GRAY);
+                DrawCenteredText("Press Esc to Return to Start Menu", 305, 20, GRAY);
+                //DrawCenteredText("Press Esc to Quit Game", 350, 20, GRAY);
+            } break;
+
+            case Screen::QuitPrompt: {
+                DrawCenteredText("Quit Game?", 120, 48, GOLD);
+
+                for (size_t i = 0; i < quitPromptItems.size(); i++) {
+                    Rectangle r = quitPromptItems[i].rect;
+                    bool isSelected = static_cast<int>(i) == quitPromptSelectedItem;
+
+                    // Draw menu item container
+                    DrawRectangleRounded(r, 0.5f, 10,
+                        isSelected ? MENU_ITEM_SELECTED_COLOR : MENU_ITEM_BASE_COLOR);
+
+                    // Draw menu item text
+                    int textWidth = MeasureText(quitPromptItems[i].label.c_str(), MENU_FONT_SIZE);
+                    DrawText(quitPromptItems[i].label.c_str(),
+                        static_cast<int>(r.x + (r.width - textWidth) / 2),
+                        static_cast<int>(r.y + (r.height - MENU_FONT_SIZE) / 2),
+                        MENU_FONT_SIZE,
+                        isSelected ? MENU_ITEM_SELECTED_TEXT_COLOR : MENU_ITEM_BASE_TEXT_COLOR);
+                }
             } break;
         }
         EndDrawing();
