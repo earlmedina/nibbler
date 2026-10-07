@@ -11,6 +11,13 @@ constexpr int TARGET_FPS = 60;
 constexpr int CELL_SIZE = 20;
 constexpr int COLS = SCREEN_WIDTH / CELL_SIZE;
 constexpr int ROWS = SCREEN_HEIGHT / CELL_SIZE;
+constexpr Color BACKGROUND_COLOR = { 20, 24, 36, 255 };
+constexpr Color ALTERNATE_COLOR = GRAY;
+
+// Step Constants (for snake movement speed)
+constexpr float INITIAL_STEP_INTERVAL = 0.15f; // Time between drawing steps (higher = slower snake, lower = faster snake)
+constexpr float FOOD_SPEED_BOOST = 0.005f; // Time subtracted from current step time after food is eaten (to make snake go slightly faster and make the game increasingly difficult)
+constexpr float MIN_STEP_INTERVAL = 0.05f; // The minimum time between drawing steps (determines the snake's max speed)
 
 enum class Screen { StartMenu, Instructions, Options, Gameplay, GameOver };
 enum class TextEffect { None, Bob, Blink };
