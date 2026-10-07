@@ -14,7 +14,7 @@ constexpr int CELL_SIZE = 20;
 constexpr int COLS = SCREEN_WIDTH / CELL_SIZE;
 constexpr int ROWS = SCREEN_HEIGHT / CELL_SIZE;
 constexpr Color BACKGROUND_COLOR = { 20, 24, 36, 255 };
-constexpr Color ALTERNATE_COLOR = { 245, 245, 245, 20 };;
+constexpr Color ALTERNATE_COLOR = { 245, 245, 245, 20 };
 
 // Step Constants (for snake movement speed)
 constexpr float INITIAL_STEP_INTERVAL = 0.15f; // Time between drawing steps (higher = slower snake, lower = faster snake)
@@ -260,7 +260,6 @@ private:
     std::deque<Cell> body; // Deque data structure used to track snake body
     std::deque<Cell> turnQueue; // Deque data structure used to queue snake turns (used to prevent collisions caused by reverse moment)
     Cell currentDirection; // The current direction of movement
-    bool canTurn = false; // Whether or not the snake can turn (e.g., a reverse direction is forbidden)
     bool isGrowing = false; // Flag used to denote whether or not the snake is growing (has just eaten food)
 };
 
