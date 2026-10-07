@@ -584,8 +584,12 @@ int main() {
             } break;
 
             case Screen::GameOver: {
-                game.Draw(); // Draw the final game frame and overlay game over content
-
+                game.Draw(); // Draw the final game frame and overlay Game Over content
+                DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, Fade(BLACK, 0.5));
+                DrawCenteredText("GAME OVER", 100, 64, RED);
+                DrawCenteredText(TextFormat("Score: %d    High Score: %d", game.Score(), highScore), 184, 24, LIGHTGRAY);
+                DrawCenteredText("Press Enter to Play Again", 260, 28, RAYWHITE, TextEffect::Blink);
+                DrawCenteredText("Press Esc to Exit Game", 305, 28, GRAY);
 
             } break;
         }
