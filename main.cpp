@@ -160,6 +160,16 @@ void DrawMenuItems(std::vector<MenuItem> &menuItems, int selectedMenuItem) {
     }
 }
 
+void NavigateMenu(int &selectedItem, int itemCount) {
+    // Allow Up navigations with Up or W keys
+    if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
+        selectedItem = (selectedItem - 1 + itemCount) % itemCount; // Wraparound if before start
+
+    // Allow Down navigations with Down or S keys
+    if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S))
+        selectedItem = (selectedItem + 1) % itemCount; // Wraparound if past end
+}
+
 class Snake {
 public:
     // Constructor
@@ -493,13 +503,7 @@ int main() {
         // Conditionally handle updates by screen as seen in example: https://www.raylib.com/examples/core/loader.html?name=core_basic_screen_manager
         switch (currentScreen) {
             case Screen::StartMenu: {
-                // Allow Up navigations with Up or W keys
-                if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
-                    selectedStartMenuItem = (selectedStartMenuItem - 1 + static_cast<int>(startMenuItems.size())) % static_cast<int>(startMenuItems.size()); // Wraparound if before start
-
-                // Allow Down navigations with Down or S keys
-                if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S))
-                    selectedStartMenuItem = (selectedStartMenuItem + 1) % static_cast<int>(startMenuItems.size()); // Wraparound if past end
+                NavigateMenu(selectedStartMenuItem, static_cast<int>(startMenuItems.size()));
 
                 // Handle User selection
                 if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)) {
@@ -568,13 +572,7 @@ int main() {
             } break;
 
             case Screen::QuitPrompt: {
-                // Allow Up navigations with Up or W keys
-                if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
-                    quitPromptSelectedItem = (quitPromptSelectedItem - 1 + 2) % 2; // Wraparound
-
-                // Allow Down navigations with Down or S keys
-                if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S))
-                    quitPromptSelectedItem = (quitPromptSelectedItem + 1) % 2; // Wraparound
+                NavigateMenu(quitPromptSelectedItem, 2);
 
                 // Handle User selection
                 if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)) {
