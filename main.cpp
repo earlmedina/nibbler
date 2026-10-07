@@ -502,13 +502,11 @@ int main() {
             } break;
 
             case Screen::Instructions: {
-                // Placeholder
                 if (IsKeyPressed(KEY_ESCAPE) || IsKeyPressed(KEY_BACKSPACE))
                     currentScreen = Screen::StartMenu;
             } break;
 
             case Screen::Options: {
-                // Placeholder
                 if (IsKeyPressed(KEY_ESCAPE) || IsKeyPressed(KEY_BACKSPACE))
                     currentScreen = Screen::StartMenu;
             } break;
@@ -590,7 +588,6 @@ int main() {
                 DrawCenteredText(TextFormat("Score: %d    High Score: %d", game.Score(), highScore), 184, 24, LIGHTGRAY);
                 DrawCenteredText("Press Enter to Play Again", 260, 28, RAYWHITE, TextEffect::Blink);
                 DrawCenteredText("Press Esc to Exit Game", 305, 28, GRAY);
-
             } break;
         }
         EndDrawing();
