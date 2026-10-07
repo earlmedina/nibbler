@@ -14,7 +14,7 @@ constexpr int CELL_SIZE = 20;
 constexpr int COLS = SCREEN_WIDTH / CELL_SIZE;
 constexpr int ROWS = SCREEN_HEIGHT / CELL_SIZE;
 constexpr Color BACKGROUND_COLOR = { 20, 24, 36, 255 };
-constexpr Color ALTERNATE_COLOR = GRAY;
+constexpr Color ALTERNATE_COLOR = { 245, 245, 245, 20 };;
 
 // Step Constants (for snake movement speed)
 constexpr float INITIAL_STEP_INTERVAL = 0.15f; // Time between drawing steps (higher = slower snake, lower = faster snake)
