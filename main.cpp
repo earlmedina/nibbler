@@ -9,6 +9,13 @@ constexpr int SCREEN_WIDTH = 800;
 constexpr int SCREEN_HEIGHT = 450;
 constexpr int TARGET_FPS = 60;
 
+// Menu Constants
+constexpr Color MENU_ITEM_BASE_COLOR = { 255, 255, 255, 15 };
+constexpr Color MENU_ITEM_SELECTED_COLOR = { 255, 200, 0, 60 };
+constexpr Color MENU_ITEM_BASE_TEXT_COLOR = RAYWHITE;
+constexpr Color MENU_ITEM_SELECTED_TEXT_COLOR = GOLD;
+constexpr int MENU_FONT_SIZE = 30;
+
 // Grid Constants
 constexpr int CELL_SIZE = 20;
 constexpr int COLS = SCREEN_WIDTH / CELL_SIZE;
@@ -425,8 +432,9 @@ int main() {
     SetExitKey(KEY_NULL); // Override default
     Screen currentScreen = Screen::StartMenu; // Set start screen to Start Menu
 
+    /*** Start Menu ***/
     // Create array to store start menu options
-    std::vector<MenuItem> menuItems = {
+    std::vector<MenuItem> startMenuItems = {
     {"Play", {}},
     {"How to Play", {}},
     {"Options", {}},
@@ -434,8 +442,8 @@ int main() {
     };
 
     // Set rect values
-    SetMenuItemRects(menuItems);
-    int selectedItem = 0; // By default, first item is selected.
+    SetMenuItemRects(startMenuItems);
+    int selectedStartMenuItem = 0; // By default, first item is selected.
 
     int highScore = 0; /***** placeholder *******/
     bool quitGame = false;
@@ -452,16 +460,18 @@ int main() {
             case Screen::StartMenu: {
                 // Allow Up navigations with Up or W keys
                 if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
-                    selectedItem = (selectedItem - 1 + static_cast<int>(menuItems.size())) % static_cast<int>(menuItems.size()); // Wraparound if before start
+                    selectedStartMenuItem = (selectedStartMenuItem - 1 + static_cast<int>(startMenuItems.size())) % static_cast<int>(startMenuItems.size()); // Wraparound if before start
 
                 // Allow Down navigations with Down or S keys
                 if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S))
-                    selectedItem = (selectedItem + 1) % static_cast<int>(menuItems.size()); // Wraparound if past end
+                    selectedStartMenuItem = (selectedStartMenuItem + 1) % static_cast<int>(startMenuItems.size()); // Wraparound if past end
 
                 // Handle User selection
                 if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)) {
-                    switch (selectedItem) {
+                    switch (selectedStartMenuItem) {
                         case 0: {
+                            if (game.IsGameOver())
+                                game.NewGame();
                             currentScreen = Screen::Gameplay;
                             break;
                         }
@@ -529,31 +539,25 @@ int main() {
         // Conditionally render screen as seen in example: https://www.raylib.com/examples/core/loader.html?name=core_basic_screen_manager
         switch (currentScreen) {
             case Screen::StartMenu: {
-
                 // Draw title and subtitle
                 DrawCenteredText(title, 60, 60, SKYBLUE, TextEffect::Bob);
                 DrawCenteredText("A snake game made with raylib", 130, 20, LIGHTGRAY);
 
-                // Draw menu items
-                Color baseMenuItemColor = { 255, 255, 255, 15 };
-                Color selectedMenuItemColor = { 255, 200, 0, 60 };
-
-                for (size_t i = 0; i < menuItems.size(); i++) {
-                    constexpr int menuFontSize = 30;
-                    Rectangle r = menuItems[i].rect;
-                    bool isSelected = static_cast<int>(i) == selectedItem;
+                for (size_t i = 0; i < startMenuItems.size(); i++) {
+                    Rectangle r = startMenuItems[i].rect;
+                    bool isSelected = static_cast<int>(i) == selectedStartMenuItem;
 
                     // Draw menu item container
                     DrawRectangleRounded(r, 0.5f, 10,
-                        isSelected ? selectedMenuItemColor : baseMenuItemColor);
+                        isSelected ? MENU_ITEM_SELECTED_COLOR : MENU_ITEM_BASE_COLOR);
 
                     // Draw menu item text
-                    int textWidth = MeasureText(menuItems[i].label.c_str(), menuFontSize);
-                    DrawText(menuItems[i].label.c_str(),
+                    int textWidth = MeasureText(startMenuItems[i].label.c_str(), MENU_FONT_SIZE);
+                    DrawText(startMenuItems[i].label.c_str(),
                         static_cast<int>(r.x + (r.width - textWidth) / 2),
-                        static_cast<int>(r.y + (r.height - menuFontSize) / 2),
-                        menuFontSize,
-                        isSelected ? GOLD : RAYWHITE);
+                        static_cast<int>(r.y + (r.height - MENU_FONT_SIZE) / 2),
+                        MENU_FONT_SIZE,
+                        isSelected ? MENU_ITEM_SELECTED_TEXT_COLOR : MENU_ITEM_BASE_TEXT_COLOR);
                 }
 
                 // Show flashing help text
