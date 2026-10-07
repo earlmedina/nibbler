@@ -88,6 +88,52 @@ namespace Direction {
     constexpr Cell Right = { 1, 0 };
 }
 
+/**
+ *  * Helper function used to draw centered text
+ * @param text      - Text to draw
+ * @param y         - Y position on screen
+ * @param fontSize  - Text font size
+ * @param color     - Text color
+ * @param effect    - TextEffect enum
+ */
+void DrawCenteredText(const char *text, int y, int fontSize, Color color, TextEffect effect = TextEffect::None) {
+    int textWidth = MeasureText(text, fontSize);
+    const auto t = static_cast<float>(GetTime()); // Needs to be cast to float for sinf
+    switch (effect) {
+        // Draw text using bobbing effect
+        // Approach modified from: https://stackoverflow.com/questions/67322860/how-do-i-make-a-simple-idle-bobbing-motion-animation
+        // The general idea is to apply a sine wave to the Y position to make it bob
+        case TextEffect::Bob: {
+            int transformation = static_cast<int>(sinf(t * 2.0f) * 6.0f);
+            DrawText(text, (SCREEN_WIDTH - textWidth) / 2, y + transformation, fontSize, color);
+        } break;
+        case TextEffect::Blink: {
+            // Show flashing/blinking text
+            // Adapted from this libgdx example: https://gamedev.stackexchange.com/questions/150504/how-to-make-a-sprite-blink-with-libgdx
+            // and using Fade function: https://www.raylib.com/cheatsheet/cheatsheet.html
+            float alpha = (sinf(t * 1.7f) * 0.5f) + 0.5f;
+            DrawText(text, (SCREEN_WIDTH - textWidth) / 2, y, fontSize, Fade(color, alpha));
+        } break;
+            // Intentional fallthrough
+        case TextEffect::None:
+        default:
+            DrawText(text, (SCREEN_WIDTH - textWidth) / 2, y, fontSize, color);
+            break;
+    }
+}
+
+/**
+ * Sets rectangle values on menu items
+ * @param menuItems - reference to MenuItem array
+ */
+void SetMenuItemRects(std::vector<MenuItem> &menuItems) {
+    const float itemWidth = 260.0f;
+    const float itemHeight = 44.0f;
+    for (size_t i = 0; i < menuItems.size(); i++ ) {
+        menuItems[i].rect = { (SCREEN_WIDTH - itemWidth) / 2.0f, 190.0f + i * 55.0f, itemWidth, itemHeight };
+    }
+}
+
 class Snake {
 public:
     // Constructor
