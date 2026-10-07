@@ -515,6 +515,8 @@ int main() {
                     game.NewGame();
                     currentScreen = Screen::Gameplay;
                 }
+                if (IsKeyPressed(KEY_BACKSPACE))
+                    currentScreen = Screen::StartMenu;
                 if (IsKeyPressed(KEY_ESCAPE))
                     quitGame = true;
             } break;
@@ -587,7 +589,8 @@ int main() {
                 DrawCenteredText("GAME OVER", 100, 64, RED);
                 DrawCenteredText(TextFormat("Score: %d    High Score: %d", game.Score(), highScore), 184, 24, LIGHTGRAY);
                 DrawCenteredText("Press Enter to Play Again", 260, 28, RAYWHITE, TextEffect::Blink);
-                DrawCenteredText("Press Esc to Exit Game", 305, 28, GRAY);
+                DrawCenteredText("Press BackSpace to Return to Start Menu", 305, 20, GRAY);
+                DrawCenteredText("Press Esc to Quit Game", 350, 20, GRAY);
             } break;
         }
         EndDrawing();
