@@ -439,8 +439,14 @@ int main() {
     SetMenuItemRects(menuItems);
     int selectedItem = 0; // By default, first item is selected.
 
+    int highScore = 0; /***** placeholder *******/
     bool quitGame = false;
+
+    Game game; // Init game
+
     while (!WindowShouldClose() && !quitGame) {
+        const float dt = GetFrameTime(); // Passed to game
+
         // Update
         //----------------------------------------------------------------------------------
         // Conditionally handle updates by screen as seen in example: https://www.raylib.com/examples/core/loader.html?name=core_basic_screen_manager
@@ -478,9 +484,22 @@ int main() {
             } break;
 
             case Screen::Gameplay: {
-                // Placeholder
-                if (IsKeyPressed(KEY_ESCAPE) || IsKeyPressed(KEY_BACKSPACE))
+                if (IsKeyPressed(KEY_ESCAPE) || IsKeyPressed(KEY_BACKSPACE)) {
                     currentScreen = Screen::StartMenu;
+                    break;
+                }
+
+                // Handle input and update game
+                game.HandleInput();
+                game.Update(dt);
+
+                // If game end, show Game Over screen
+                if (game.IsGameOver()) {
+                    if (game.Score() > highScore)
+                        highScore = game.Score();
+
+                    currentScreen = Screen::GameOver;
+                }
             } break;
 
             case Screen::Instructions: {
@@ -495,6 +514,10 @@ int main() {
                     currentScreen = Screen::StartMenu;
             } break;
             case Screen::GameOver: {
+                if (IsKeyPressed(KEY_ENTER)) {
+                    game.NewGame();
+                    currentScreen = Screen::Gameplay;
+                }
                 if (IsKeyPressed(KEY_ESCAPE))
                     quitGame = true;
             } break;
@@ -503,12 +526,11 @@ int main() {
         // Draw
         //----------------------------------------------------------------------------------
         BeginDrawing();
-        ClearBackground({ 20, 24, 36, 255 }); // Change background to dark blue
+        ClearBackground(BACKGROUND_COLOR); // Change background to dark blue
 
         // Conditionally render screen as seen in example: https://www.raylib.com/examples/core/loader.html?name=core_basic_screen_manager
         switch (currentScreen) {
             case Screen::StartMenu: {
-                float t = static_cast<float>(GetTime());
 
                 // Draw title and subtitle
                 DrawCenteredText(title, 60, 60, SKYBLUE, TextEffect::Bob);
@@ -559,10 +581,12 @@ int main() {
             } break;
 
             case Screen::Gameplay: {
-
+                game.Draw();
             } break;
 
             case Screen::GameOver: {
+                game.Draw(); // Draw the final game frame and overlay game over content
+
 
             } break;
         }
