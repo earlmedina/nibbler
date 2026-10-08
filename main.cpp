@@ -605,12 +605,13 @@ int main() {
             } break;
 
             case Screen::Instructions: {
-                // Draw directions
-                DrawText("Movement", 100, 20, 48,  GOLD);
-                DrawText("Use arrow or WASD keys to navigate the snake", 100, 90, 20,  RAYWHITE);
-                DrawText("Objectives", 100, 150, 48,  GOLD);
-                DrawText("* Collect food to earn points", 100, 220, 20,  RAYWHITE);
-                DrawText("* Do your best to avoid colliding with yourself or walls", 100, 260, 20,  RAYWHITE);
+                // Draw screen title
+                DrawCenteredText("How to Play", 60, 60, SKYBLUE);
+                DrawText("Movement", 100, 140, 48,  GOLD);
+                DrawText("Use arrow or WASD keys to navigate the snake", 100, 200, 20,  RAYWHITE);
+                DrawText("Objectives", 100, 250, 48,  GOLD);
+                DrawText("* Collect food to earn points", 100, 310, 20,  RAYWHITE);
+                DrawText("* Do your best to avoid colliding with yourself or walls", 100, 350, 20,  RAYWHITE);
 
                 // Draw flashing help text
                 DrawCenteredText("Press ESC to return to Start Menu",
