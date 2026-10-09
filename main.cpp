@@ -202,6 +202,139 @@ void DrawMenuItems(std::vector<MenuItem> &menuItems, int selectedMenuItem) {
     }
 }
 
+// Height of key box
+constexpr float KEY_HEIGHT = HINT_FONT_SIZE + 2 * KEY_PADDING;
+
+// Helper function to determine if a key label is an arrow key
+bool IsArrowKey(const std::string &keyLabel) {
+    return keyLabel == "Up" || keyLabel == "Down" || keyLabel == "Left" || keyLabel == "Right";
+}
+
+float GetKeyBoxWidth(const std::string &keyLabel) {
+    // Arrow and single char labels should be square
+    if (IsArrowKey(keyLabel) || keyLabel.size() ==1)
+        return KEY_HEIGHT;
+    // Otherwise, measure text and account for x padding on both sides
+    return static_cast<float>(MeasureText(keyLabel.c_str(), HINT_FONT_SIZE)) + 2 * KEY_PADDING;
+}
+
+float GetHintPartWidth(const HintPart &part) {
+    // For empty strings, return spacer.
+    if (part.text.empty())
+        return HINT_SPACER;
+
+    // For keys, return the calculated key box width
+    if (part.isKey)
+        return GetKeyBoxWidth(part.text);
+
+    // Otherwise, it's plain text so return MeasureText result
+    return static_cast<float>(MeasureText(part.text.c_str(), HINT_FONT_SIZE));
+}
+
+float MeasureHintLine(const std::vector<HintPart> &parts) {
+    float totalWidth = 0.0f;
+    for (size_t i = 0; i < parts.size(); i++) {
+        if (i > 0)
+            totalWidth += HINT_GAP; // Account for space between hint parts
+        totalWidth += GetHintPartWidth(parts[i]);
+    }
+    return totalWidth;
+}
+
+/**
+ * Draws a key label inside a box so that it looks like a keyboard key
+ * @param keyLabel - key text
+ * @param x - left edge of the key box
+ * @param y - top of the key label
+ * @return The x position of the key's right edge
+ */
+float DrawKey(const std::string &keyLabel, float x, float y) {
+    // Draw key box
+    const Rectangle box = { x, y - KEY_PADDING, GetKeyBoxWidth(keyLabel), KEY_HEIGHT };
+    DrawRectangleRounded(box, 0.3f, 6, MENU_ITEM_BASE_COLOR);
+    DrawRectangleLinesEx(box, 1.0f, Fade(RAYWHITE, 0.35f));
+
+    // If it's an arrow key, draw key label as triangle
+    if (IsArrowKey(keyLabel)) {
+        const float cx = box.x + box.width / 2.0f; // Calculate center x of box
+        const float cy = box.y + box.height / 2.0f; // Calculate center y of box
+        const float r = box.height * 0.2f; // Triangle coords are based on center, so this is the triangle "radius".
+
+        // Draw arrows as triangles
+        // Note: DrawTriangle points are in CCW order: https://github.com/raysan5/raylib/issues/941
+
+        if (keyLabel == "Up")
+            DrawTriangle({ cx, cy - r }, { cx - r, cy + r },
+        { cx + r, cy + r }, RAYWHITE);
+        else if (keyLabel == "Down")
+            DrawTriangle({ cx, cy + r }, { cx + r, cy - r },
+        { cx - r, cy - r }, RAYWHITE);
+        else if (keyLabel == "Left")
+            DrawTriangle({ cx - r, cy }, { cx + r, cy + r },
+        { cx + r, cy - r }, RAYWHITE);
+        else
+            DrawTriangle({ cx + r, cy }, { cx - r, cy - r },
+        { cx - r, cy + r }, RAYWHITE);
+        return x + box.width; // Return "end" of keybox to know where to start next part
+    }
+
+    // Draw key label centered in the box
+    const float keyLabelWidth = static_cast<float>(MeasureText(keyLabel.c_str(), HINT_FONT_SIZE));
+    DrawText(keyLabel.c_str(), static_cast<int>(x + (box.width - keyLabelWidth) / 2.0f),
+        static_cast<int>(y), HINT_FONT_SIZE, RAYWHITE);
+
+    return x + box.width; // Return "end" of keybox to know where to start next part
+}
+
+/**
+ * Takes an array of hint parts and draws them at the specific top left position
+ * @param parts - array of hint parts
+ * @param x  - x position where line should start
+ * @param y  - y position where line should start
+ * @return - x position where the line ends
+ */
+float DrawHintLine(const std::vector<HintPart> &parts, float x, float y) {
+    for (size_t i = 0; i < parts.size(); i++) {
+        const HintPart &part = parts[i]; // reference part
+
+        // Add space between parts
+        if (i > 0)
+            x += HINT_GAP;
+
+        if (!part.text.empty()) {
+            if (part.isKey)
+                DrawKey(part.text, x, y);
+            else
+                DrawText(part.text.c_str(), static_cast<int>(x), static_cast<int>(y), HINT_FONT_SIZE, LIGHTGRAY);
+        }
+        x += GetHintPartWidth(part);
+    }
+    return x;
+}
+
+/**
+ * Helper function to draw the hint bar footer shown on screens
+ * @param hintLine - array of hint parts representing a line to draw
+ */
+void DrawHintBar(const std::vector<HintPart> &hintLine) {
+    // Draw to separate hint bar from play grid
+    DrawLine(0, HINT_BAR_Y, SCREEN_WIDTH, HINT_BAR_Y, Fade(RAYWHITE, 0.5));
+    const float x = (SCREEN_WIDTH - MeasureHintLine(hintLine)) / 2.0f; // Figure out where line should start to be x-centered
+    const float y = HINT_BAR_Y + (HINT_BAR_HEIGHT - HINT_FONT_SIZE) / 2.0f; // Figure out where line should start to be y-centered
+    DrawHintLine(hintLine, x, y);
+}
+
+/**** Hint Lines ****/
+const std::vector<HintPart> startMenuHintLine = {
+    { "Move: ", false }, { "Up", true }, { "Down", true }, { " or ", false },
+    { "W", true }, { "A", true }, { "S", true }, { "D", true }, {"", false},
+    {"Select: ", false}, { "Enter", true }, { " or ", false }, { "Click", false }
+};
+
+
+
+
+
 /**
  * Helper function used to handle menu navigation via keyboard
  * @param selectedItem reference to item index
