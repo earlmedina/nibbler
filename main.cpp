@@ -16,6 +16,20 @@ constexpr Color MENU_ITEM_BASE_TEXT_COLOR = RAYWHITE;
 constexpr Color MENU_ITEM_SELECTED_TEXT_COLOR = GOLD;
 constexpr int MENU_FONT_SIZE = 30;
 
+// Text Constants
+constexpr int BODY_FONT_SIZE = 16;
+constexpr int BODY_LINE_HEIGHT = 22;
+
+// Hint Bar Constants
+constexpr int HINT_BAR_HEIGHT = 60;
+constexpr int HINT_BAR_Y = SCREEN_HEIGHT - HINT_BAR_HEIGHT;
+
+// Hint Line Constants
+constexpr float KEY_PADDING = 6.0f; // Space between key label and its box
+constexpr float HINT_GAP = 6.0f; // Space between hint line parts
+constexpr float HINT_SPACER = 30.0f; // Space inserted for empty string part
+constexpr float HINT_FONT_SIZE = 16.0f;
+
 // Grid Constants
 constexpr int CELL_SIZE = 20;
 constexpr int COLS = SCREEN_WIDTH / CELL_SIZE;
