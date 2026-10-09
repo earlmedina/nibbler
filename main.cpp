@@ -91,8 +91,8 @@ struct Cell {
      */
     Rectangle ToRect() const {
         return {
-            float(x * CELL_SIZE),
-            float(y * CELL_SIZE),
+            float(BOARD_X + x * CELL_SIZE),
+            float(BOARD_Y + y * CELL_SIZE),
             float(CELL_SIZE),
             float(CELL_SIZE)
         };
