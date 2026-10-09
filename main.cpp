@@ -33,7 +33,9 @@ constexpr float HINT_FONT_SIZE = 16.0f;
 // Grid Constants
 constexpr int CELL_SIZE = 20;
 constexpr int COLS = SCREEN_WIDTH / CELL_SIZE;
-constexpr int ROWS = SCREEN_HEIGHT / CELL_SIZE;
+constexpr int ROWS = HINT_BAR_Y / CELL_SIZE; // exclude hint footer
+constexpr int BOARD_X = 0; // The actual X coord where the board starts - includes just in case the design changes
+constexpr int BOARD_Y = 0;
 constexpr Color BACKGROUND_COLOR = { 20, 24, 36, 255 };
 constexpr Color ALTERNATE_COLOR = { 245, 245, 245, 20 };
 
