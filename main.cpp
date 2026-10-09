@@ -170,6 +170,17 @@ void NavigateMenu(int &selectedItem, int itemCount) {
         selectedItem = (selectedItem + 1) % itemCount; // Wraparound if past end
 }
 
+void HandleMouseNavigation(std::vector<MenuItem> &menuItems, bool &clicked, int &selectedItem) {
+    const Vector2 mousePos = GetMousePosition();
+    for (size_t i = 0; i < menuItems.size(); i++) {
+        if (CheckCollisionPointRec(mousePos, menuItems[i].rect)) {
+            selectedItem = i;
+            if (IsMouseButtonPressed((MOUSE_BUTTON_LEFT)))
+                clicked = true;
+        }
+    }
+}
+
 class Snake {
 public:
     // Constructor
@@ -488,7 +499,7 @@ int main() {
         {"No", {} }
     };
     SetMenuItemRects(quitPromptItems);
-    int quitPromptSelectedItem = 1;
+    int selectedQuitPromptItem = 1;
 
     /*** Game Vars ***/
     int highScore = 0; /***** placeholder *******/
@@ -503,10 +514,13 @@ int main() {
         // Conditionally handle updates by screen as seen in example: https://www.raylib.com/examples/core/loader.html?name=core_basic_screen_manager
         switch (currentScreen) {
             case Screen::StartMenu: {
-                NavigateMenu(selectedStartMenuItem, static_cast<int>(startMenuItems.size()));
+                HandleKeyboardNavigation(selectedStartMenuItem, static_cast<int>(startMenuItems.size()));
+
+                bool clicked = false;
+                HandleMouseNavigation(startMenuItems, clicked, selectedStartMenuItem);
 
                 // Handle User selection
-                if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)) {
+                if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE) || clicked) {
                     switch (selectedStartMenuItem) {
                         case 0: {
                             if (game.IsGameOver())
@@ -523,7 +537,7 @@ int main() {
                             break;
                         }
                         case 3: {
-                            quitPromptSelectedItem = 1;
+                            selectedQuitPromptItem = 1;
                             currentScreen = Screen::QuitPrompt;
                             break;
                         }
@@ -572,11 +586,13 @@ int main() {
             } break;
 
             case Screen::QuitPrompt: {
-                NavigateMenu(quitPromptSelectedItem, 2);
+                bool clicked = false;
+                HandleKeyboardNavigation(selectedQuitPromptItem, 2);
+                HandleMouseNavigation(quitPromptItems, clicked, selectedQuitPromptItem);
 
                 // Handle User selection
-                if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)) {
-                    if (quitPromptSelectedItem == 0)
+                if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE) || clicked) {
+                    if (selectedQuitPromptItem == 0)
                         quitGame = true;
                     else
                         currentScreen = Screen::StartMenu;
@@ -640,7 +656,7 @@ int main() {
                 DrawCenteredText("Quit Game?", 130, 48, GOLD);
 
                 // Draw menu items
-                DrawMenuItems(quitPromptItems, quitPromptSelectedItem);
+                DrawMenuItems(quitPromptItems, selectedQuitPromptItem);
             } break;
         }
         EndDrawing();
