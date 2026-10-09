@@ -201,15 +201,37 @@ void HandleKeyboardNavigation(int &selectedItem, int itemCount) {
  * @param clicked reference to bool click variable
  * @param selectedItem reference to item index
  */
-void HandleMouseNavigation(std::vector<MenuItem> &menuItems, bool &clicked, int &selectedItem) {
+void HandleMouseNavigation(const std::vector<MenuItem> &menuItems, bool &clicked, int &selectedItem) {
     const Vector2 mousePos = GetMousePosition();
+
+    // Check if mouse has moved to determine focus
+    const Vector2 mouseDelta = GetMouseDelta();
+    const bool mouseMoved = mouseDelta.x != 0.0f || mouseDelta.y != 0.0f;
+
+    // Check if any of the menu items was clicked
+    const bool mousePressed = IsMouseButtonPressed(MOUSE_BUTTON_LEFT);
     for (size_t i = 0; i < menuItems.size(); i++) {
         if (CheckCollisionPointRec(mousePos, menuItems[i].rect)) {
-            selectedItem = i;
-            if (IsMouseButtonPressed((MOUSE_BUTTON_LEFT)))
+            if (mouseMoved || mousePressed)
+                selectedItem = static_cast<int>(i);
+            if (mousePressed)
                 clicked = true;
         }
     }
+}
+
+/**
+ * Helper function that handles menu selection
+ * @param menuItems reference MenuItem array
+ * @param selectedMenuItem reference to selected menu item index
+ * @return bool indicated whether a highlighted menu item was clicked or Enter was pressed
+ */
+bool HandleMenuSelection(const std::vector<MenuItem> &menuItems, int &selectedMenuItem) {
+    HandleKeyboardNavigation(selectedMenuItem, static_cast<int>(menuItems.size()));
+
+    bool clicked = false;
+    HandleMouseNavigation(menuItems, clicked, selectedMenuItem);
+    return clicked || IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_KP_ENTER); // Include keypad enter
 }
 
 class Snake {
@@ -545,13 +567,8 @@ int main() {
         // Conditionally handle updates by screen as seen in example: https://www.raylib.com/examples/core/loader.html?name=core_basic_screen_manager
         switch (currentScreen) {
             case Screen::StartMenu: {
-                HandleKeyboardNavigation(selectedStartMenuItem, static_cast<int>(startMenuItems.size()));
-
-                bool clicked = false;
-                HandleMouseNavigation(startMenuItems, clicked, selectedStartMenuItem);
-
                 // Handle User selection
-                if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE) || clicked) {
+                if (HandleMenuSelection(startMenuItems, selectedStartMenuItem)) {
                     switch (selectedStartMenuItem) {
                         case 0: {
                             if (game.IsGameOver())
@@ -617,12 +634,7 @@ int main() {
             } break;
 
             case Screen::QuitPrompt: {
-                bool clicked = false;
-                HandleKeyboardNavigation(selectedQuitPromptItem, 2);
-                HandleMouseNavigation(quitPromptItems, clicked, selectedQuitPromptItem);
-
-                // Handle User selection
-                if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE) || clicked) {
+                if (HandleMenuSelection(quitPromptItems, selectedQuitPromptItem)) {
                     if (selectedQuitPromptItem == 0)
                         quitGame = true;
                     else
