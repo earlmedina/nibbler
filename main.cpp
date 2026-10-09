@@ -130,14 +130,34 @@ void DrawCenteredText(const char *text, int y, int fontSize, Color color, TextEf
 }
 
 /**
- * Sets rectangle values on menu items
- * @param menuItems - reference to MenuItem array
+ * Helper function that draws several lines of text at once
+ * @param x x-coord
+ * @param y y-coord
+ * @param lines lines of text as initializer list: https://stackoverflow.com/questions/27753420/initializer-list-vs-vector
+ * @param fontSize font size
+ * @param lineHeight line height (space between lines)
+ * @param color text color
  */
-void SetMenuItemRects(std::vector<MenuItem> &menuItems) {
-    const float itemWidth = 260.0f;
-    const float itemHeight = 44.0f;
+void DrawTextLines(int x, int y, std::initializer_list<const char *> lines,
+                   int fontSize = BODY_FONT_SIZE, int lineHeight = BODY_LINE_HEIGHT, Color color = RAYWHITE) {
+
+    for (const char *line : lines) {
+        DrawText(line, x, y, fontSize, color);
+        y += lineHeight;
+    }
+}
+
+/**
+ * Prepares centered menu layout by setting rectangle values on menu items
+ * @param menuItems reference to MenuItem array
+ * @param startY Y position of top left corner of menu
+ * @param itemWidth width of menu items
+ * @param itemHeight height of menu items
+ * @param itemSpacing distance between menu items
+ */
+void LayoutMenu(std::vector<MenuItem> &menuItems, float startY, float itemWidth, float itemHeight, float itemSpacing) {
     for (size_t i = 0; i < menuItems.size(); i++ ) {
-        menuItems[i].rect = { (SCREEN_WIDTH - itemWidth) / 2.0f, 190.0f + i * 55.0f, itemWidth, itemHeight };
+        menuItems[i].rect = { (SCREEN_WIDTH - itemWidth) / 2.0f, startY + i * itemSpacing, itemWidth, itemHeight };
     }
 }
 
@@ -160,6 +180,11 @@ void DrawMenuItems(std::vector<MenuItem> &menuItems, int selectedMenuItem) {
     }
 }
 
+/**
+ * Helper function used to handle menu navigation via keyboard
+ * @param selectedItem reference to item index
+ * @param itemCount the count of menu items
+ */
 void HandleKeyboardNavigation(int &selectedItem, int itemCount) {
     // Allow Up navigations with Up or W keys
     if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
@@ -170,6 +195,12 @@ void HandleKeyboardNavigation(int &selectedItem, int itemCount) {
         selectedItem = (selectedItem + 1) % itemCount; // Wraparound if past end
 }
 
+/**
+ * Helper function used to handle menu navigation via mouse
+ * @param menuItems reference to menuItems array
+ * @param clicked reference to bool click variable
+ * @param selectedItem reference to item index
+ */
 void HandleMouseNavigation(std::vector<MenuItem> &menuItems, bool &clicked, int &selectedItem) {
     const Vector2 mousePos = GetMousePosition();
     for (size_t i = 0; i < menuItems.size(); i++) {
@@ -482,7 +513,7 @@ int main() {
     };
 
     // Set rect values
-    SetMenuItemRects(startMenuItems);
+    LayoutMenu(startMenuItems, 220.0f, 320.0f, 56.0f, 72.0f);
     int selectedStartMenuItem = 0; // By default, first item is selected.
 
     /*** Quit Prompt ***/
@@ -498,7 +529,7 @@ int main() {
         {"Yes", {} },
         {"No", {} }
     };
-    SetMenuItemRects(quitPromptItems);
+    LayoutMenu(quitPromptItems, 270.0f, 240.0f, 52.0f, 68.0f);
     int selectedQuitPromptItem = 1;
 
     /*** Game Vars ***/
@@ -619,7 +650,6 @@ int main() {
                 DrawCenteredText("Use Up/Down arrow keys or W/S to select - ENTER to select",
                     (SCREEN_HEIGHT - 30), 18, LIGHTGRAY, TextEffect::Blink);
 
-                DrawKey(KEY_UP, 100, SCREEN_HEIGHT - 30, 30);
             } break;
 
             case Screen::Instructions: {
