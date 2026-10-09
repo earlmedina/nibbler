@@ -160,7 +160,7 @@ void DrawMenuItems(std::vector<MenuItem> &menuItems, int selectedMenuItem) {
     }
 }
 
-void NavigateMenu(int &selectedItem, int itemCount) {
+void HandleKeyboardNavigation(int &selectedItem, int itemCount) {
     // Allow Up navigations with Up or W keys
     if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
         selectedItem = (selectedItem - 1 + itemCount) % itemCount; // Wraparound if before start
@@ -618,6 +618,8 @@ int main() {
                 // Show flashing help text
                 DrawCenteredText("Use Up/Down arrow keys or W/S to select - ENTER to select",
                     (SCREEN_HEIGHT - 30), 18, LIGHTGRAY, TextEffect::Blink);
+
+                DrawKey(KEY_UP, 100, SCREEN_HEIGHT - 30, 30);
             } break;
 
             case Screen::Instructions: {
