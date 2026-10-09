@@ -674,6 +674,7 @@ private:
 
 int main() {
     const char *title = "Nibbler";
+    const char *subTitle = "A quick, fun classic arcade game";
 
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, title);
     SetTargetFPS(TARGET_FPS);
@@ -808,15 +809,13 @@ int main() {
             case Screen::StartMenu: {
                 // Draw title and subtitle
                 DrawCenteredText(title, 60, 60, SKYBLUE, TextEffect::Bob);
-                DrawCenteredText("A snake game made with raylib", 130, 20, LIGHTGRAY);
+                DrawCenteredText(subTitle, 130, 20, LIGHTGRAY);
 
                 // Draw menu items
                 DrawMenuItems(startMenuItems, selectedStartMenuItem);
 
                 // Show flashing help text
-                DrawCenteredText("Use Up/Down arrow keys or W/S to select - ENTER to select",
-                    (SCREEN_HEIGHT - 30), 18, LIGHTGRAY, TextEffect::Blink);
-
+                DrawHintBar(startMenuHintLine);
             } break;
 
             case Screen::Instructions: {
