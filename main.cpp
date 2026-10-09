@@ -53,6 +53,12 @@ struct MenuItem {
     Rectangle rect;
 };
 
+// Struct used to model hint content part
+struct HintPart {
+    std::string text;
+    bool isKey; // whether content is a key
+};
+
 // Struct used for grid cells
 // Note: depends on CELL_SIZE, COLS, and ROWS constants
 struct Cell {
