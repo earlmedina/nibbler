@@ -17,6 +17,9 @@ constexpr Color MENU_ITEM_SELECTED_TEXT_COLOR = GOLD;
 constexpr int MENU_FONT_SIZE = 30;
 
 // Text Constants
+constexpr Color SCREEN_TITLE_COLOR = { 155, 227, 184, 255};
+constexpr Color HEADING_COLOR = GOLD;
+constexpr int HEADING_FONT_SIZE = 18;
 constexpr int BODY_FONT_SIZE = 16;
 constexpr int BODY_LINE_HEIGHT = 22;
 
@@ -44,8 +47,9 @@ constexpr float INITIAL_STEP_INTERVAL = 0.15f; // Time between drawing steps (hi
 constexpr float FOOD_SPEED_BOOST = 0.005f; // Time subtracted from current step time after food is eaten (to make snake go slightly faster and make the game increasingly difficult)
 constexpr float MIN_STEP_INTERVAL = 0.05f; // The minimum time between drawing steps (determines the snake's max speed)
 
-enum class Screen { StartMenu, Instructions, Options, Gameplay, GameOver, QuitPrompt };
+enum class Screen { StartMenu, HowToPlay, Options, Gameplay, GameOver, QuitPrompt };
 enum class TextEffect { None, Bob, Blink };
+enum class GameEndType { None, WallCollision, SelfCollision, BoardFull };
 
 // Struct used for drawing menu items
 struct MenuItem {
@@ -116,6 +120,18 @@ namespace Direction {
     constexpr Cell Left = { -1, 0 };
     constexpr Cell Right = { 1, 0 };
 }
+
+/**** Hint Lines ****/
+const std::vector<HintPart> START_MENU_HINT_LINE = {
+    { "Move: ", false }, { "Up", true }, { "Down", true }, { " or ", false },
+    { "W", true },{ "S", true },  {"", false},
+    {"Select: ", false}, { "Enter", true }, { " or ", false }, { "Click", false }
+};
+
+const std::vector<HintPart> HOW_TO_PLAY_HINT_LINE = {
+    { "Enter", true }, { "or", false }, { "Click", false },
+    { "Back to Start Menu", false }
+};
 
 /**
  *  * Helper function used to draw centered text
@@ -324,16 +340,57 @@ void DrawHintBar(const std::vector<HintPart> &hintLine) {
     DrawHintLine(hintLine, x, y);
 }
 
-/**** Hint Lines ****/
-const std::vector<HintPart> startMenuHintLine = {
-    { "Move: ", false }, { "Up", true }, { "Down", true }, { " or ", false },
-    { "W", true },{ "S", true },  {"", false},
-    {"Select: ", false}, { "Enter", true }, { " or ", false }, { "Click", false }
-};
+/**
+ * Helper function to draw info text shown on How To screen
+ */
+void DrawHowToPlayContent() {
+    DrawCenteredText("How to Play", 20, 40, SCREEN_TITLE_COLOR);
+    // Left column content
+    constexpr  int leftX = 40;
+    DrawText("GOAL", leftX, 84, HEADING_FONT_SIZE, HEADING_COLOR);
+    DrawTextLines(leftX, 110, {
+        "Steer the snake to food (red circles).",
+        "Each piece you eat earns 1 point. How",
+        "high can you score?"
+    });
 
+    DrawText("CONTROLS", leftX, 190, HEADING_FONT_SIZE, HEADING_COLOR);
+    DrawTextLines(leftX, 216, {
+        "While playing, steer with arrow keys or",
+        "WASD. To navigate menus, use the same",
+        "keys and select with Enter, or just click",
+        "an option. If one way doesn't work, try",
+        "the other."
+    });
 
+    DrawText("WATCH OUT", leftX, 340, HEADING_FONT_SIZE, HEADING_COLOR);
+    DrawTextLines(leftX, 366, {
+        "Hitting a wall ends the game. Be careful",
+        "when you're close to the edge of the",
+        "window!"
+    });
 
+    // Right column content
+    constexpr int rightX = 420;
+    DrawText("STEPS", rightX, 84, HEADING_FONT_SIZE, HEADING_COLOR);
+    DrawTextLines(rightX, 110, {
+        "1.  Select Play (press Enter or click).",
+        "2. Press an arrow key or WASD to start.",
+        "   The snake won't move until you do!",
+        "3. Steer to the food and avoid the",
+        "   walls.",
+        "4. When the game ends, choose ",
+        "Play Again or Start Menu."
+    });
 
+    DrawText("NEED TO BACK OUT OF A SCREEN?", rightX, 280, HEADING_FONT_SIZE, HEADING_COLOR);
+    DrawTextLines(rightX, 306, {
+        "You can always go back: Select Back on",
+        "this screen, No on the Quit prompt, and",
+        "Start Menu after a game."
+    });
+
+}
 
 /**
  * Helper function used to handle menu navigation via keyboard
@@ -681,28 +738,32 @@ int main() {
     SetExitKey(KEY_NULL); // Override default
     Screen currentScreen = Screen::StartMenu; // Set start screen to Start Menu
 
+    /************ MENU SETUP ************/
+    // Create array to store menu options and then set placement values
+
     /*** Start Menu ***/
-    // Create array to store start menu options
     std::vector<MenuItem> startMenuItems = {
-    {"Play", {}},
-    {"How to Play", {}},
-    {"Options", {}},
-    {"Quit", {}}
+    { "Play", {} },
+    { "How to Play", {} },
+    { "Options", {} },
+    { "Quit", {} }
     };
 
-    // Set rect values
+    // Set placement
     LayoutMenu(startMenuItems, 220.0f, 320.0f, 56.0f, 72.0f);
-    int selectedStartMenuItem = 0; // By default, first item is selected.
+    int selectedStartMenuItem = 0; // By default, first item (Play) is selected.
+
+    /*** How to Play ***/
+    std::vector<MenuItem> howToPlayItems = {
+    {"Back", {} },
+    };
+
+    LayoutMenu(howToPlayItems, 470.0f, 200.0f, 52.0f, 0.0f);
+    int selectedHowToPlayItem = 0;
+
+
 
     /*** Quit Prompt ***/
-    // constexpr float quitItemWidth = 140.0f;
-    // constexpr float quitItemHeight = 40.0f;
-    // constexpr float quitItemStartX = (SCREEN_WIDTH - (2 * quitItemWidth)) / 2;
-    // constexpr float quitItemStartY = 230.0f;
-    // std::vector<MenuItem> quitPromptItems = {
-    //     {"Yes", {quitItemStartX, quitItemStartY, quitItemWidth, quitItemHeight } },
-    //     {"No", {quitItemStartX, quitItemStartY + quitItemHeight + 30.0f, quitItemWidth, quitItemHeight } }
-    // };
     std::vector<MenuItem> quitPromptItems = {
         {"Yes", {} },
         {"No", {} }
@@ -733,7 +794,7 @@ int main() {
                             break;
                         }
                         case 1: {
-                            currentScreen = Screen::Instructions;
+                            currentScreen = Screen::HowToPlay;
                             break;
                         }
                         case 2: {
@@ -768,8 +829,8 @@ int main() {
                 }
             } break;
 
-            case Screen::Instructions: {
-                if (IsKeyPressed(KEY_ESCAPE) || IsKeyPressed(KEY_BACKSPACE))
+            case Screen::HowToPlay: {
+                if (HandleMenuSelection(howToPlayItems, selectedHowToPlayItem))
                     currentScreen = Screen::StartMenu;
             } break;
 
@@ -808,28 +869,25 @@ int main() {
         switch (currentScreen) {
             case Screen::StartMenu: {
                 // Draw title and subtitle
-                DrawCenteredText(title, 60, 60, SKYBLUE, TextEffect::Bob);
+                DrawCenteredText(title, 60, 60, SCREEN_TITLE_COLOR, TextEffect::Bob);
                 DrawCenteredText(subTitle, 130, 20, LIGHTGRAY);
 
                 // Draw menu items
                 DrawMenuItems(startMenuItems, selectedStartMenuItem);
 
-                // Show flashing help text
-                DrawHintBar(startMenuHintLine);
+                // Show Hint Bar
+                DrawHintBar(START_MENU_HINT_LINE);
             } break;
 
-            case Screen::Instructions: {
-                // Draw screen title
-                DrawCenteredText("How to Play", 60, 60, SKYBLUE);
-                DrawText("Movement", 100, 140, 48,  GOLD);
-                DrawText("Use arrow or WASD keys to navigate the snake", 100, 200, 20,  RAYWHITE);
-                DrawText("Objectives", 100, 250, 48,  GOLD);
-                DrawText("* Collect food to earn points", 100, 310, 20,  RAYWHITE);
-                DrawText("* Do your best to avoid colliding with yourself or walls", 100, 350, 20,  RAYWHITE);
+            case Screen::HowToPlay: {
+                // Draw main How to Play Content
+                DrawHowToPlayContent();
 
-                // Draw flashing help text
-                DrawCenteredText("Press ESC to return to Start Menu",
-                    (SCREEN_HEIGHT - 30), 18,  LIGHTGRAY);
+                // Draw Back button
+                DrawMenuItems(howToPlayItems, selectedHowToPlayItem);
+
+                // Show Hint Bar
+                DrawHintBar(HOW_TO_PLAY_HINT_LINE);
             } break;
 
             case Screen::Options: {
