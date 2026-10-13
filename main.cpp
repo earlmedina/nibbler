@@ -327,7 +327,7 @@ void DrawHintBar(const std::vector<HintPart> &hintLine) {
 /**** Hint Lines ****/
 const std::vector<HintPart> startMenuHintLine = {
     { "Move: ", false }, { "Up", true }, { "Down", true }, { " or ", false },
-    { "W", true }, { "A", true }, { "S", true }, { "D", true }, {"", false},
+    { "W", true },{ "S", true },  {"", false},
     {"Select: ", false}, { "Enter", true }, { " or ", false }, { "Click", false }
 };
 
