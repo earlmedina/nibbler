@@ -206,7 +206,7 @@ void DrawTextLinesEx(float x, float y, std::initializer_list<const char *> lines
 
     for (const char *line : lines) {
         //DrawText(line, x, y, fontSize, color);
-        DrawTextEx(font, line, (Vector2){ x, y }, fontSize, 0.5, color);
+        DrawTextEx(font, line, (Vector2){ roundf(x), roundf(y) }, fontSize, 0.5, color); // Use roundf because otherwise it can look blurry
         y += lineHeight;
     }
 }
@@ -833,14 +833,16 @@ private:
 int main() {
     const char *title = "Nibbler";
     const char *subTitle = "A quick, fun classic arcade game";
-
+    SetConfigFlags(FLAG_WINDOW_HIGHDPI); // Looks blurry on dev machine otherwise
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, title);
     ChangeDirectory(GetApplicationDirectory()); // For proper font loading
     SetTargetFPS(TARGET_FPS);
     SetExitKey(KEY_NULL); // Override default
-    Font howToFont = LoadFontEx("resources/Menlo-Regular.ttf", 64, nullptr, 0);
+    int howToFontSize = static_cast<int>(roundf(32 * GetWindowScaleDPI().x)); // For better scaling
+    Font howToFont = LoadFontEx("resources/Menlo-Regular.ttf", howToFontSize, nullptr, 0);
     GenTextureMipmaps(&howToFont.texture);
     SetTextureFilter(howToFont.texture, TEXTURE_FILTER_POINT);
+
     Screen currentScreen = Screen::StartMenu; // Set start screen to Start Menu
 
     /************ MENU SETUP ************/
