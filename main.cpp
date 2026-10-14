@@ -6,7 +6,8 @@
 #include <cmath>
 
 // For sprint 2
-constexpr int SHOW_LIVE_SCORE = 0;
+constexpr bool SHOW_LIVE_SCORE = false;
+constexpr bool ENABLE_GROWTH = false;
 
 constexpr int SCREEN_WIDTH = 800;
 constexpr int SCREEN_HEIGHT = 600;
@@ -134,6 +135,13 @@ const std::vector<HintPart> START_MENU_HINT_LINE = {
 const std::vector<HintPart> HOW_TO_PLAY_HINT_LINE = {
     { "Enter", true }, { "or", false }, { "Click", false },
     { "Back to Start Menu", false }
+};
+
+const std::vector<HintPart> GAMEPLAY_HINT_LINE = {
+    { "Steer: ", false }, { "Up", true }, { "Left", true }, { "Down", true }, { "Right", true },
+    { " or ", false }, { "W", true }, { "A", true }, { "S", true }, { "D", true },
+    {"", false },
+    { "Hitting a wall ends the game!" }
 };
 
 /**
@@ -468,8 +476,15 @@ public:
         body.clear(); // Clear body deque
         turnQueue.clear(); // Clear any pending turns
 
-        // By default, Snake will be moving right from the top left corner
-        body.push_back({0, 0});
+        // Set snake start position
+        const int startHeadX = COLS / 2 - 3;
+        const int startHeadY = ROWS / 2;
+        body.push_back({startHeadX, startHeadY});
+        // Make the snake longer for sprint 1 demonstration purposes
+        if (!ENABLE_GROWTH) {
+            body.push_back({startHeadX - 1, startHeadY});
+            body.push_back({startHeadX - 2, startHeadY});
+        }
         currentDirection = Direction::Right;
         isGrowing = false;
     }
@@ -739,7 +754,8 @@ private:
         // - Spawn new food - if, in the unlikely case there are no free cells left, end the game.
         //   - Add a million points to the score as the player has "beaten" the game.
         if (snake.Head() == food.Position()) {
-            snake.Grow();
+            if (ENABLE_GROWTH)
+                snake.Grow();
             score++;
             stepInterval = fmaxf(MIN_STEP_INTERVAL, stepInterval - FOOD_SPEED_BOOST);
             if (!food.Spawn(snake)) {
@@ -932,6 +948,9 @@ int main() {
 
             case Screen::Gameplay: {
                 game.Draw();
+
+                // Show Hint Bar
+                DrawHintBar(GAMEPLAY_HINT_LINE);
             } break;
 
             case Screen::GameOver: {
