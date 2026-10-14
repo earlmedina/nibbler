@@ -388,36 +388,36 @@ void DrawStartMenuScreen(const char *title, const char *subTitle, const std::vec
 /**
  * Helper function to draw info text shown on How To screen
  */
-void DrawHowToPlayContent(Font headingFont, Font font) {
+void DrawHowToPlayContent(Font font) {
     DrawCenteredText("How to Play", 20, 40, SCREEN_TITLE_COLOR);
     // Left column content
     constexpr  int leftX = 40;
     //DrawText("GOAL", leftX, 84, HEADING_FONT_SIZE, HEADING_COLOR);
-    DrawTextEx(headingFont, "GOAL", { leftX, 84 }, HEADING_FONT_SIZE, HEADING_SPACING, HEADING_COLOR);
+    DrawTextEx(font, "GOAL", { leftX, 84 }, HEADING_FONT_SIZE, HEADING_SPACING, HEADING_COLOR);
     DrawTextLinesEx(leftX, 110, {
         "Steer the snake to food (red circles).",
         "Each piece you eat earns 1 point. How",
         "high can you score?"
     }, font);
-    DrawTextEx(headingFont, "CONTROLS", { leftX, 190 }, HEADING_FONT_SIZE, HEADING_SPACING, HEADING_COLOR);
+    DrawTextEx(font, "CONTROLS", { leftX, 190 }, HEADING_FONT_SIZE, HEADING_SPACING, HEADING_COLOR);
     DrawTextLinesEx(leftX, 216, {
-        "While playing, steer with arrow keys or",
-        "WASD. To navigate menus, use the same",
-        "keys and select with Enter, or just click",
-        "an option. If one way doesn't work, try",
-        "the other."
+        "While playing, steer with arrow keys",
+        "or WASD. To navigate menus, use the",
+        "same keys and select with Enter, or",
+        "just click an option. If one way does",
+        "not work, try the other."
     }, font);
 
-    DrawTextEx(headingFont, "WATCH OUT", { leftX, 340 }, HEADING_FONT_SIZE, HEADING_SPACING, HEADING_COLOR);
+    DrawTextEx(font, "WATCH OUT", { leftX, 340 }, HEADING_FONT_SIZE, HEADING_SPACING, HEADING_COLOR);
     DrawTextLinesEx(leftX, 366, {
-        "Hitting a wall ends the game. Be careful",
-        "when you're close to the edge of the",
-        "window!"
+        "Hitting a wall ends the game, so be",
+        "careful when you're close to the edge",
+        "of the window!"
     }, font);
 
     // Right column content
     constexpr int rightX = 420;
-    DrawTextEx(headingFont, "STEPS", { rightX, 84 }, HEADING_FONT_SIZE, HEADING_SPACING, HEADING_COLOR);
+    DrawTextEx(font, "STEPS", { rightX, 84 }, HEADING_FONT_SIZE, HEADING_SPACING, HEADING_COLOR);
     DrawTextLinesEx(rightX, 110, {
         "1. Select Play (press Enter or click).",
         "2. Press an arrow key or WASD to start.",
@@ -428,7 +428,7 @@ void DrawHowToPlayContent(Font headingFont, Font font) {
         "   Play Again or Start Menu."
     }, font);
 
-    DrawTextEx(headingFont, "NEED TO BACK OUT OF A SCREEN?", { rightX, 280 }, HEADING_FONT_SIZE, HEADING_SPACING, HEADING_COLOR);
+    DrawTextEx(font, "NEED TO BACK OUT OF A SCREEN?", { rightX, 280 }, HEADING_FONT_SIZE, HEADING_SPACING, HEADING_COLOR);
     DrawTextLinesEx(rightX, 306, {
         "You can always go back: Select Back on",
         "this screen, No on the Quit prompt, and",
@@ -838,9 +838,7 @@ int main() {
     ChangeDirectory(GetApplicationDirectory()); // For proper font loading
     SetTargetFPS(TARGET_FPS);
     SetExitKey(KEY_NULL); // Override default
-    Font contentFont = LoadFontEx("resources/Menlo-Regular.ttf", BODY_FONT_SIZE, 0, 250);
-    Font headingFont = LoadFontEx("resources/Menlo-Regular.ttf", HEADING_FONT_SIZE, 0, 250);
-
+    Font howToFont = LoadFont("resources/Menlo-Regular.ttf");
     Screen currentScreen = Screen::StartMenu; // Set start screen to Start Menu
 
     /************ MENU SETUP ************/
@@ -986,7 +984,7 @@ int main() {
 
             case Screen::HowToPlay: {
                 // Draw main How to Play Content
-                DrawHowToPlayContent(headingFont, contentFont);
+                DrawHowToPlayContent(howToFont);
 
                 // Draw Back button
                 DrawMenuItems(howToPlayItems, selectedHowToPlayItem);
@@ -1041,8 +1039,7 @@ int main() {
         }
         EndDrawing();
     }
-    UnloadFont(contentFont);
-    UnloadFont(headingFont);
+    UnloadFont(howToFont);
     CloseWindow();
 
     return 0;
