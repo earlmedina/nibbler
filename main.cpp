@@ -46,6 +46,9 @@ constexpr int BOARD_Y = 0;
 constexpr Color BACKGROUND_COLOR = { 20, 24, 36, 255 };
 constexpr Color ALTERNATE_COLOR = { 245, 245, 245, 20 };
 
+// Misc
+constexpr Color QUIT_PROMPT_COLOR = { 24, 30, 40, 255 };
+
 // Step Constants (for snake movement speed)
 constexpr float INITIAL_STEP_INTERVAL = 0.15f; // Time between drawing steps (higher = slower snake, lower = faster snake)
 constexpr float FOOD_SPEED_BOOST = 0.005f; // Time subtracted from current step time after food is eaten (to make snake go slightly faster and make the game increasingly difficult)
@@ -211,7 +214,7 @@ void LayoutMenu(std::vector<MenuItem> &menuItems, float startY, float itemWidth,
     }
 }
 
-void DrawMenuItems(std::vector<MenuItem> &menuItems, int selectedMenuItem) {
+void DrawMenuItems(const std::vector<MenuItem> &menuItems, int selectedMenuItem) {
     for (size_t i = 0; i < menuItems.size(); i++) {
         Rectangle r = menuItems[i].rect;
         bool isSelected = static_cast<int>(i) == selectedMenuItem;
@@ -350,6 +353,25 @@ void DrawHintBar(const std::vector<HintPart> &hintLine) {
     const float x = (SCREEN_WIDTH - MeasureHintLine(hintLine)) / 2.0f; // Figure out where line should start to be x-centered
     const float y = HINT_BAR_Y + (HINT_BAR_HEIGHT - HINT_FONT_SIZE) / 2.0f; // Figure out where line should start to be y-centered
     DrawHintLine(hintLine, x, y);
+}
+
+/**
+ * Helper function to draw start menu screen. Used for dimming effect when drawing quit prompt.
+ * @param title - title text
+ * @param subTitle - subtitle text
+ * @param startMenuItems - MenuItem array
+ * @param selectedStartMenuItem - selected start menu item index
+ */
+void DrawStartMenuScreen(const char *title, const char *subTitle, const std::vector<MenuItem> &startMenuItems, const int selectedStartMenuItem) {
+    // Draw title and subtitle
+    DrawCenteredText(title, 60, 60, SCREEN_TITLE_COLOR, TextEffect::Bob);
+    DrawCenteredText(subTitle, 130, 20, LIGHTGRAY);
+
+    // Draw menu items
+    DrawMenuItems(startMenuItems, selectedStartMenuItem);
+
+    // Show Hint Bar
+    DrawHintBar(MENU_HINT_LINE);
 }
 
 /**
@@ -944,15 +966,7 @@ int main() {
         // Conditionally render screen as seen in example: https://www.raylib.com/examples/core/loader.html?name=core_basic_screen_manager
         switch (currentScreen) {
             case Screen::StartMenu: {
-                // Draw title and subtitle
-                DrawCenteredText(title, 60, 60, SCREEN_TITLE_COLOR, TextEffect::Bob);
-                DrawCenteredText(subTitle, 130, 20, LIGHTGRAY);
-
-                // Draw menu items
-                DrawMenuItems(startMenuItems, selectedStartMenuItem);
-
-                // Show Hint Bar
-                DrawHintBar(MENU_HINT_LINE);
+                DrawStartMenuScreen(title, subTitle, startMenuItems, selectedStartMenuItem);
             } break;
 
             case Screen::HowToPlay: {
@@ -994,7 +1008,17 @@ int main() {
             } break;
 
             case Screen::QuitPrompt: {
-                DrawCenteredText("Quit Game?", 130, 48, GOLD);
+                // Draw a dimmed start menu in the background
+                DrawStartMenuScreen(title, subTitle, startMenuItems, selectedStartMenuItem);
+                DrawRectangle(0, 0, SCREEN_WIDTH, HINT_BAR_Y, Fade(BLACK, 0.6f));
+
+                // Draw Quit Prompt
+                const float roundness = 0.1f;
+                const Rectangle dialog = { 200.0f, 150.0f, SCREEN_WIDTH / 2, 280.0f };
+                DrawRectangleRounded(dialog, roundness, 8, QUIT_PROMPT_COLOR);
+                DrawRectangleRoundedLines(dialog, roundness, 8, ORANGE);
+                DrawCenteredText("Quit Game?", 176, 36, ORANGE);
+                DrawCenteredText("The game window will close.", 230, 24, LIGHTGRAY);
 
                 // Draw menu items
                 DrawMenuItems(quitPromptItems, selectedQuitPromptItem);
