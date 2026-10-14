@@ -54,6 +54,7 @@ constexpr float MIN_STEP_INTERVAL = 0.05f; // The minimum time between drawing s
 enum class Screen { StartMenu, HowToPlay, Options, Gameplay, GameOver, QuitPrompt };
 enum class TextEffect { None, Bob, Blink };
 enum class GameEndType { None, WallCollision, SelfCollision, BoardFull };
+enum class MoveResult { Ok, WallCollision, SelfCollision };
 
 // Struct used for drawing menu items
 struct MenuItem {
@@ -509,11 +510,11 @@ public:
 
     /**
      * Perform a movement based on turnQueue or current direction (if empty)
-    *  Note: used this CodeLogic video to get a general sense of how Snake movement logic
-    *  should work in a Snake game: https://www.youtube.com/watch?v=dZF0zseLcY0
-     * @return false if there's a collision, true otherwise
+     *  Note: used this CodeLogic video to get a general sense of how Snake movement logic
+     *  should work in a Snake game: https://www.youtube.com/watch?v=dZF0zseLcY0
+     * @return MoveResult enum value
      */
-    bool Move() {
+    MoveResult Move() {
         // If the turnQueue is not empty, then set currentDirection to next queued direction and pop
         // (Otherwise, there's no queued turns and we simply move in the current direction
         if (!turnQueue.empty()) {
@@ -524,6 +525,10 @@ public:
         // For movement, we determine what the new head will be
         const Cell nextHead = Head() + currentDirection;
 
+        // If the next head is not within bounds (collides with wall) return WallCollision result
+        if (!nextHead.WithinBounds())
+            return MoveResult::WallCollision;
+
         /********* Collision Checks *********/
         // Body Collision:
         // For this check, we need to know what the next body size will be
@@ -532,17 +537,11 @@ public:
         const size_t newBodySize = isGrowing ? body.size() : body.size() - 1;
 
         // Check new head position against body
-        bool collidesBody = false;
         for (size_t i = 0; i < newBodySize; i++) {
             if (body[i] == nextHead) {
-                collidesBody = true;
-                break;
+                return MoveResult::SelfCollision; // Return SelfCollision if snake self collides
             }
         }
-
-        // If the next head is not within bounds (collides with wall) or collides with the body, return false
-        if (!nextHead.WithinBounds() || collidesBody)
-            return false;
 
         // Otherwise, push next head to front
         body.push_front(nextHead);
@@ -553,7 +552,7 @@ public:
         else
             body.pop_back();
 
-        return true; // return true for legal move
+        return MoveResult::Ok; // return Ok for collisionless move
     }
 
     /**
@@ -642,8 +641,9 @@ public:
         snake.Reset(); // Reset snake position/size
         food.Spawn(snake); // Spawn food
         score = 0; // Reset score
-        gameStarted = false; // Reset gameStarted falg
+        gameStarted = false; // Reset gameStarted flag
         gameOver = false; // Reset gameOver flag
+        gameEndType = GameEndType::None; // Reset game end type
         stepInterval = INITIAL_STEP_INTERVAL; // Reset to initial step interval
         timeSinceStep = 0.0f; // Reset step time
     }
@@ -726,12 +726,23 @@ public:
         return score;
     }
 
+    const char *GetGameEndMessage() const {
+        switch (gameEndType) {
+            case GameEndType::BoardFull: return "Congratulations! You filled the board!";
+            case GameEndType::SelfCollision: return "You ran into yourself!";
+            case GameEndType::WallCollision: return "You hit a wall!";
+            case GameEndType::None: // Intentional fallthrough
+            default: return ""; // Print nothing
+        }
+    }
+
 private:
     Snake snake; // Default initialization
     Food food;  // Default initialization
     int score = 0;
     bool gameStarted = false;
     bool gameOver = false;
+    GameEndType gameEndType = GameEndType::None;
     float stepInterval = INITIAL_STEP_INTERVAL;
     float timeSinceStep = 0.0f;
 
@@ -742,7 +753,11 @@ private:
     // https://www.youtube.com/watch?v=dZF0zseLcY0
     void Step() {
         // If the snake move results in a collision, end the game.
-        if (!snake.Move()) {
+        MoveResult snakeMoveResult = snake.Move();
+        if (snakeMoveResult != MoveResult::Ok) {
+            gameEndType = snakeMoveResult == MoveResult::SelfCollision
+                ? GameEndType::SelfCollision
+                : GameEndType::WallCollision;
             gameOver = true;
             return;
         }
@@ -760,6 +775,7 @@ private:
             stepInterval = fmaxf(MIN_STEP_INTERVAL, stepInterval - FOOD_SPEED_BOOST);
             if (!food.Spawn(snake)) {
                 score += 1000000;
+                gameEndType = GameEndType::BoardFull;
                 gameOver = true;
             }
         }
@@ -962,8 +978,12 @@ int main() {
             } break;
 
             case Screen::GameOver: {
-                DrawCenteredText("GAME OVER", 100, 64, ORANGE);
-                DrawCenteredText(TextFormat("FINAL SCORE:   %d", game.Score()), 230, 24, LIGHTGRAY);
+                DrawCenteredText("GAME OVER", 100, 64, ORANGE, TextEffect::Blink);
+                // Explain why the game ended
+                DrawCenteredText(game.GetGameEndMessage(), 180, 24, LIGHTGRAY);
+
+                // Draw Score
+                DrawCenteredText(TextFormat("FINAL SCORE:   %d", game.Score()), 230, 32, LIGHTGRAY);
                 //DrawCenteredText(TextFormat("FINAL SCORE: %d    High Score: %d", game.Score(), highScore), 184, 24, LIGHTGRAY);
 
                 // Draw menu
