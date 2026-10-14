@@ -41,3 +41,12 @@ target_include_directories(nibbler PRIVATE ${raylib_INCLUDE_DIRS})
 
 # link all libraries to the project
 target_link_libraries(nibbler PRIVATE ${LIB1})
+
+# Copy resources to build dir
+# https://stackoverflow.com/questions/69890019/what-cmake-command-will-copy-a-directory-of-files-to-a-directory-in-a-post-build
+add_custom_command(TARGET nibbler POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+                ${CMAKE_SOURCE_DIR}/resources
+                $<TARGET_FILE_DIR:nibbler>/resources
+)
+
