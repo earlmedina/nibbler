@@ -23,9 +23,10 @@ constexpr int MENU_FONT_SIZE = 30;
 // Text Constants
 constexpr Color SCREEN_TITLE_COLOR = { 155, 227, 184, 255};
 constexpr Color HEADING_COLOR = GOLD;
-constexpr int HEADING_FONT_SIZE = 18;
-constexpr int BODY_FONT_SIZE = 16;
+constexpr int HEADING_FONT_SIZE = 21.0f;
+constexpr float BODY_FONT_SIZE = 17.0f;
 constexpr int BODY_LINE_HEIGHT = 22;
+constexpr float HEADING_SPACING = 1.2f;
 
 // Hint Bar Constants
 constexpr int HINT_BAR_HEIGHT = 60;
@@ -191,11 +192,21 @@ void DrawCenteredText(const char *text, int y, int fontSize, Color color, TextEf
  * @param lineHeight line height (space between lines)
  * @param color text color
  */
-void DrawTextLines(int x, int y, std::initializer_list<const char *> lines,
-                   int fontSize = BODY_FONT_SIZE, int lineHeight = BODY_LINE_HEIGHT, Color color = RAYWHITE) {
+void DrawTextLines(int x, int y, std::initializer_list<const char *> lines, int fontSize = BODY_FONT_SIZE,
+    int lineHeight = BODY_LINE_HEIGHT, Color color = RAYWHITE) {
 
     for (const char *line : lines) {
         DrawText(line, x, y, fontSize, color);
+        y += lineHeight;
+    }
+}
+
+void DrawTextLinesEx(float x, float y, std::initializer_list<const char *> lines, const Font &font, float fontSize = BODY_FONT_SIZE,
+    float lineHeight = BODY_LINE_HEIGHT, Color color = RAYWHITE) {
+
+    for (const char *line : lines) {
+        //DrawText(line, x, y, fontSize, color);
+        DrawTextEx(font, line, (Vector2){ x, y }, fontSize, 0.5, color);
         y += lineHeight;
     }
 }
@@ -377,52 +388,52 @@ void DrawStartMenuScreen(const char *title, const char *subTitle, const std::vec
 /**
  * Helper function to draw info text shown on How To screen
  */
-void DrawHowToPlayContent() {
+void DrawHowToPlayContent(Font headingFont, Font font) {
     DrawCenteredText("How to Play", 20, 40, SCREEN_TITLE_COLOR);
     // Left column content
     constexpr  int leftX = 40;
-    DrawText("GOAL", leftX, 84, HEADING_FONT_SIZE, HEADING_COLOR);
-    DrawTextLines(leftX, 110, {
+    //DrawText("GOAL", leftX, 84, HEADING_FONT_SIZE, HEADING_COLOR);
+    DrawTextEx(headingFont, "GOAL", { leftX, 84 }, HEADING_FONT_SIZE, HEADING_SPACING, HEADING_COLOR);
+    DrawTextLinesEx(leftX, 110, {
         "Steer the snake to food (red circles).",
         "Each piece you eat earns 1 point. How",
         "high can you score?"
-    });
-
-    DrawText("CONTROLS", leftX, 190, HEADING_FONT_SIZE, HEADING_COLOR);
-    DrawTextLines(leftX, 216, {
+    }, font);
+    DrawTextEx(headingFont, "CONTROLS", { leftX, 190 }, HEADING_FONT_SIZE, HEADING_SPACING, HEADING_COLOR);
+    DrawTextLinesEx(leftX, 216, {
         "While playing, steer with arrow keys or",
         "WASD. To navigate menus, use the same",
         "keys and select with Enter, or just click",
         "an option. If one way doesn't work, try",
         "the other."
-    });
+    }, font);
 
-    DrawText("WATCH OUT", leftX, 340, HEADING_FONT_SIZE, HEADING_COLOR);
-    DrawTextLines(leftX, 366, {
+    DrawTextEx(headingFont, "WATCH OUT", { leftX, 340 }, HEADING_FONT_SIZE, HEADING_SPACING, HEADING_COLOR);
+    DrawTextLinesEx(leftX, 366, {
         "Hitting a wall ends the game. Be careful",
         "when you're close to the edge of the",
         "window!"
-    });
+    }, font);
 
     // Right column content
     constexpr int rightX = 420;
-    DrawText("STEPS", rightX, 84, HEADING_FONT_SIZE, HEADING_COLOR);
-    DrawTextLines(rightX, 110, {
-        "1.  Select Play (press Enter or click).",
+    DrawTextEx(headingFont, "STEPS", { rightX, 84 }, HEADING_FONT_SIZE, HEADING_SPACING, HEADING_COLOR);
+    DrawTextLinesEx(rightX, 110, {
+        "1. Select Play (press Enter or click).",
         "2. Press an arrow key or WASD to start.",
         "   The snake won't move until you do!",
         "3. Steer to the food and avoid the",
         "   walls.",
         "4. When the game ends, choose ",
-        "Play Again or Start Menu."
-    });
+        "   Play Again or Start Menu."
+    }, font);
 
-    DrawText("NEED TO BACK OUT OF A SCREEN?", rightX, 280, HEADING_FONT_SIZE, HEADING_COLOR);
-    DrawTextLines(rightX, 306, {
+    DrawTextEx(headingFont, "NEED TO BACK OUT OF A SCREEN?", { rightX, 280 }, HEADING_FONT_SIZE, HEADING_SPACING, HEADING_COLOR);
+    DrawTextLinesEx(rightX, 306, {
         "You can always go back: Select Back on",
         "this screen, No on the Quit prompt, and",
         "Start Menu after a game."
-    });
+    }, font);
 
 }
 
@@ -824,8 +835,12 @@ int main() {
     const char *subTitle = "A quick, fun classic arcade game";
 
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, title);
+    ChangeDirectory(GetApplicationDirectory()); // For proper font loading
     SetTargetFPS(TARGET_FPS);
     SetExitKey(KEY_NULL); // Override default
+    Font contentFont = LoadFontEx("resources/Menlo-Regular.ttf", BODY_FONT_SIZE, 0, 250);
+    Font headingFont = LoadFontEx("resources/Menlo-Regular.ttf", HEADING_FONT_SIZE, 0, 250);
+
     Screen currentScreen = Screen::StartMenu; // Set start screen to Start Menu
 
     /************ MENU SETUP ************/
@@ -971,7 +986,7 @@ int main() {
 
             case Screen::HowToPlay: {
                 // Draw main How to Play Content
-                DrawHowToPlayContent();
+                DrawHowToPlayContent(headingFont, contentFont);
 
                 // Draw Back button
                 DrawMenuItems(howToPlayItems, selectedHowToPlayItem);
@@ -1026,7 +1041,8 @@ int main() {
         }
         EndDrawing();
     }
-
+    UnloadFont(contentFont);
+    UnloadFont(headingFont);
     CloseWindow();
 
     return 0;
