@@ -126,7 +126,7 @@ namespace Direction {
 }
 
 /**** Hint Lines ****/
-const std::vector<HintPart> START_MENU_HINT_LINE = {
+const std::vector<HintPart> MENU_HINT_LINE = {
     { "Move: ", false }, { "Up", true }, { "Down", true }, { " or ", false },
     { "W", true },{ "S", true },  {"", false},
     {"Select: ", false}, { "Enter", true }, { " or ", false }, { "Click", false }
@@ -813,7 +813,14 @@ int main() {
     LayoutMenu(howToPlayItems, 470.0f, 200.0f, 52.0f, 0.0f);
     int selectedHowToPlayItem = 0;
 
+    /*** Game Over ***/
+    std::vector<MenuItem> gameOverItems = {
+        {"Play Again", {} },
+        {"Start Menu", {} },
+    };
 
+    LayoutMenu(gameOverItems, 350.0f, 320.0f, 56.0f, 72.0f);
+    int selectedGameOverItem = 0;
 
     /*** Quit Prompt ***/
     std::vector<MenuItem> quitPromptItems = {
@@ -892,14 +899,15 @@ int main() {
             } break;
 
             case Screen::GameOver: {
-                if (IsKeyPressed(KEY_ENTER)) {
-                    game.NewGame();
-                    currentScreen = Screen::Gameplay;
+                if (HandleMenuSelection(gameOverItems, selectedGameOverItem)) {
+                    if (selectedGameOverItem == 0) {
+                        game.NewGame();
+                        currentScreen = Screen::Gameplay;
+                    } else {
+                        selectedGameOverItem = 0;
+                        currentScreen = Screen::StartMenu;
+                    }
                 }
-                if (IsKeyPressed(KEY_ESCAPE))
-                    currentScreen = Screen::StartMenu;
-                // if (IsKeyPressed(KEY_ESCAPE))
-                //     quitGame = true;
             } break;
 
             case Screen::QuitPrompt: {
@@ -928,7 +936,7 @@ int main() {
                 DrawMenuItems(startMenuItems, selectedStartMenuItem);
 
                 // Show Hint Bar
-                DrawHintBar(START_MENU_HINT_LINE);
+                DrawHintBar(MENU_HINT_LINE);
             } break;
 
             case Screen::HowToPlay: {
@@ -954,13 +962,15 @@ int main() {
             } break;
 
             case Screen::GameOver: {
-                game.Draw(); // Draw the final game frame and overlay Game Over content
-                DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, Fade(BLACK, 0.5));
-                DrawCenteredText("GAME OVER", 100, 64, RED);
-                DrawCenteredText(TextFormat("Score: %d    High Score: %d", game.Score(), highScore), 184, 24, LIGHTGRAY);
-                DrawCenteredText("Press Enter to Play Again", 260, 28, RAYWHITE, TextEffect::Blink);
-                DrawCenteredText("Press Esc to Return to Start Menu", 305, 20, GRAY);
-                //DrawCenteredText("Press Esc to Quit Game", 350, 20, GRAY);
+                DrawCenteredText("GAME OVER", 100, 64, ORANGE);
+                DrawCenteredText(TextFormat("FINAL SCORE:   %d", game.Score()), 230, 24, LIGHTGRAY);
+                //DrawCenteredText(TextFormat("FINAL SCORE: %d    High Score: %d", game.Score(), highScore), 184, 24, LIGHTGRAY);
+
+                // Draw menu
+                DrawMenuItems(gameOverItems, selectedGameOverItem);
+
+                // Draw hint bar
+                DrawHintBar(MENU_HINT_LINE);
             } break;
 
             case Screen::QuitPrompt: {
