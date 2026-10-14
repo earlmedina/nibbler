@@ -50,3 +50,9 @@ add_custom_command(TARGET nibbler POST_BUILD
                 $<TARGET_FILE_DIR:nibbler>/resources
 )
 
+# BUILD:
+# cmake -S . -B build
+# cmake --build build
+
+# Execute:
+# ./build/nibbler
