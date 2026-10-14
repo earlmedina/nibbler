@@ -813,7 +813,7 @@ int main() {
     std::vector<MenuItem> startMenuItems = {
     { "Play", {} },
     { "How to Play", {} },
-    { "Options", {} },
+    //{ "Options", {} },
     { "Quit", {} }
     };
 
@@ -872,11 +872,11 @@ int main() {
                             currentScreen = Screen::HowToPlay;
                             break;
                         }
+                        // case 2: {
+                        //     currentScreen = Screen::Options;
+                        //     break;
+                        // }
                         case 2: {
-                            currentScreen = Screen::Options;
-                            break;
-                        }
-                        case 3: {
                             selectedQuitPromptItem = 1;
                             currentScreen = Screen::QuitPrompt;
                             break;
