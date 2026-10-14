@@ -838,7 +838,9 @@ int main() {
     ChangeDirectory(GetApplicationDirectory()); // For proper font loading
     SetTargetFPS(TARGET_FPS);
     SetExitKey(KEY_NULL); // Override default
-    Font howToFont = LoadFont("resources/Menlo-Regular.ttf");
+    Font howToFont = LoadFontEx("resources/Menlo-Regular.ttf", 64, nullptr, 0);
+    GenTextureMipmaps(&howToFont.texture);
+    SetTextureFilter(howToFont.texture, TEXTURE_FILTER_POINT);
     Screen currentScreen = Screen::StartMenu; // Set start screen to Start Menu
 
     /************ MENU SETUP ************/
