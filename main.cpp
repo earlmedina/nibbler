@@ -627,6 +627,7 @@ public:
         snake.Reset(); // Reset snake position/size
         food.Spawn(snake); // Spawn food
         score = 0; // Reset score
+        gameStarted = false; // Reset gameStarted falg
         gameOver = false; // Reset gameOver flag
         stepInterval = INITIAL_STEP_INTERVAL; // Reset to initial step interval
         timeSinceStep = 0.0f; // Reset step time
@@ -636,14 +637,27 @@ public:
      * Queue snake turns from player input
      */
     void HandleInput() {
-        if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
+        bool directionKeyPressed = false;
+        if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W)) {
             snake.QueueTurn(Direction::Up);
-        if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S))
+            directionKeyPressed = true;
+        }
+        if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S)) {
             snake.QueueTurn(Direction::Down);
-        if (IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_A))
+            directionKeyPressed = true;
+        }
+        if (IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_A)) {
             snake.QueueTurn(Direction::Left);
-        if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D))
+            directionKeyPressed = true;
+        }
+        if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D)) {
             snake.QueueTurn(Direction::Right);
+            directionKeyPressed = true;
+        }
+        if (directionKeyPressed && !gameStarted) {
+            gameStarted = true;
+            timeSinceStep = 0.0f;
+        }
     }
 
     /**
@@ -651,7 +665,7 @@ public:
      * @param dt - Frame time
      */
     void Update(float dt) {
-        if (gameOver) return;
+        if (gameOver || !gameStarted) return;
 
         timeSinceStep += dt; // Update step time
         while (timeSinceStep >= stepInterval && !gameOver) {
@@ -670,6 +684,23 @@ public:
         if (SHOW_LIVE_SCORE)
             DrawCenteredText(TextFormat("Score: %d", score), 10, 20, { 255, 203, 0, 150 });
 
+        // Draw start text
+        if (!gameStarted) {
+            const int startPromptFontSize = 20;
+            const char *startPromptText = "Press an arrow key or WASD to start";
+
+            const float startY = 380.0f;
+            const float startPromptHeight = 60.0f;
+            const float startPromptWidth = 40 + MeasureText(startPromptText, startPromptFontSize);;
+
+            const Rectangle startPromptRect = { (SCREEN_WIDTH - startPromptWidth) / 2,
+                startY, startPromptWidth, startPromptHeight };
+            DrawRectangleRec(startPromptRect, Fade(BLACK, 0.6f));
+            DrawRectangleLinesEx(startPromptRect, 1.0f, GOLD);
+
+            const int textStartY = startY + (startPromptHeight - startPromptFontSize) / 2;
+            DrawCenteredText(startPromptText, textStartY, startPromptFontSize, RAYWHITE);
+        }
     }
 
     bool IsGameOver() const {
@@ -684,6 +715,7 @@ private:
     Snake snake; // Default initialization
     Food food;  // Default initialization
     int score = 0;
+    bool gameStarted = false;
     bool gameOver = false;
     float stepInterval = INITIAL_STEP_INTERVAL;
     float timeSinceStep = 0.0f;
