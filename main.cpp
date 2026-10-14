@@ -5,6 +5,9 @@
 #include <algorithm>
 #include <cmath>
 
+// For sprint 2
+constexpr int SHOW_LIVE_SCORE = 0;
+
 constexpr int SCREEN_WIDTH = 800;
 constexpr int SCREEN_HEIGHT = 600;
 constexpr int TARGET_FPS = 60;
@@ -664,7 +667,8 @@ public:
         DrawGrid();
         snake.Draw();
         food.Draw();
-        DrawCenteredText(TextFormat("Score: %d", score), 10, 20, { 255, 203, 0, 150 });
+        if (SHOW_LIVE_SCORE)
+            DrawCenteredText(TextFormat("Score: %d", score), 10, 20, { 255, 203, 0, 150 });
 
     }
 
