@@ -266,6 +266,11 @@ void LayoutMenu(std::vector<MenuItem> &menuItems, float startY, float itemWidth,
     }
 }
 
+/**
+ * Draws menu items with selection highlight
+ * @param menuItems - reference to MenuItem array
+ * @param selectedMenuItem - the index of the selected menu item
+ */
 void DrawMenuItems(const std::vector<MenuItem> &menuItems, int selectedMenuItem) {
     for (size_t i = 0; i < menuItems.size(); i++) {
         Rectangle r = menuItems[i].rect;
@@ -285,12 +290,20 @@ void DrawMenuItems(const std::vector<MenuItem> &menuItems, int selectedMenuItem)
     }
 }
 
-// Helper function to determine if a key label is an arrow key
+/**
+ * Helper function to determine if a key label is an arrow key
+ * @param keyLabel - reference to string label for key
+ * @return - true/false
+ */
 bool IsArrowKey(const std::string &keyLabel) {
     return keyLabel == "Up" || keyLabel == "Down" || keyLabel == "Left" || keyLabel == "Right";
 }
 
-// Get Width of KeyBox drawn from text
+/**
+ * Get Width of Key Box drawn from text
+ * @param keyLabel  - reference to string label for key
+ * @return - calculated width as float
+ */
 float GetKeyBoxWidth(const std::string &keyLabel) {
     // Arrow and single char labels should be square
     if (IsArrowKey(keyLabel) || keyLabel.size() == 1)
@@ -299,7 +312,12 @@ float GetKeyBoxWidth(const std::string &keyLabel) {
     return static_cast<float>(MeasureText(keyLabel.c_str(), HINT_FONT_SIZE)) + 2 * KEY_PADDING;
 }
 
-// Get width of Key drawn from texture. Useful for case where Enter texture wasn't loaded.
+/**
+ * Get width of Key drawn from texture. Useful for case where Enter texture wasn't loaded and is actually frawn from text.
+ * @param keyLabel  - reference to string label for key
+ * @param keyTextures - reference to key texture map
+ * @return
+ */
 float GetKeyWidth(const std::string &keyLabel, const std::unordered_map<std::string, Texture2D> &keyTextures) {
     // If texture was loaded, return key height
     if (keyTextures.contains(keyLabel))
@@ -308,6 +326,13 @@ float GetKeyWidth(const std::string &keyLabel, const std::unordered_map<std::str
     return GetKeyBoxWidth(keyLabel);
 }
 
+/**
+ * Measures the input hint part width. Considers font when determining width.
+ * @param part - reference to single HintPart
+ * @param keyTextures - reference to key texture map
+ * @param font - reference to font
+ * @return - float value representing HintPart width
+ */
 float GetHintPartWidth(const HintPart &part, const std::unordered_map<std::string, Texture2D> &keyTextures, const Font &font) {
     // For empty strings, return spacer.
     if (part.text.empty())
@@ -321,6 +346,13 @@ float GetHintPartWidth(const HintPart &part, const std::unordered_map<std::strin
     return MeasureTextEx(font, part.text.c_str(), HINT_FONT_SIZE, HINT_SPACING).x;
 }
 
+/**
+ * Measures the input hint line width (used for centering). Considers font when determining width.
+ * @param parts - reference to HintPart array
+ * @param keyTextures - reference to key texture map
+ * @param font - reference to font
+ * @return - float value representing line width
+ */
 float MeasureHintLine(const std::vector<HintPart> &parts, const std::unordered_map<std::string, Texture2D> &keyTextures, const Font &font) {
     float totalWidth = 0.0f;
     for (size_t i = 0; i < parts.size(); i++) {
@@ -378,6 +410,14 @@ float DrawKeyBox(const std::string &keyLabel, float x, float y) {
     return x + box.width; // Return "end" of keybox to know where to start next part
 }
 
+/**
+ * Draws key from loaded key textures
+ * @param keyTextures - reference to key texture map
+ * @param keyLabel - reference to key label
+ * @param x - start x where to draw key
+ * @param y - start y where to draw key
+ * @return - float value representing "end" of key texture to know where to start next part
+ */
 float DrawKey(const std::unordered_map<std::string, Texture2D> &keyTextures, const std::string &keyLabel, float x, float y) {
     // Try to get texture from map
     const auto iterator = keyTextures.find(keyLabel);
@@ -401,7 +441,7 @@ float DrawKey(const std::unordered_map<std::string, Texture2D> &keyTextures, con
 
     // Draw scaled key texture
     DrawTexturePro(texture, sourceRect, destRect, { 0.0f, 0.0f }, 0.0f, WHITE);
-    return x + KEY_HEIGHT; // Return "end" of key txcture to know where to start next part
+    return x + KEY_HEIGHT; // Return "end" of key texture to know where to start next part
 }
 
 /**
