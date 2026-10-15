@@ -67,6 +67,7 @@ enum class MoveResult { Ok, WallCollision, SelfCollision };
 struct MenuItem {
     std::string label;
     Rectangle rect;
+    bool isBack = false; // Used to determine if "back" sound should play
 };
 
 // Struct used to model hint content part
@@ -152,8 +153,8 @@ const std::vector<HintPart> GAMEPLAY_HINT_LINE = {
 };
 
 /**
- * Helper function that loads 128x128 key textures from paths
- * Note: must be called after InitWindow!
+ * Helper function that loads 128x128 key textures from paths. Must be called after InitWindow!
+ * Note: textures sourced from https://kenney.nl/assets/input-prompts
  * @return map with loaded textures
  */
 std::unordered_map<std::string, Texture2D> LoadKeyTextures() {
@@ -189,6 +190,53 @@ void UnloadKeyTextures(std::unordered_map<std::string, Texture2D> &keyTextures) 
     keyTextures.clear(); // clear map after finishing
 }
 
+/**
+ * Helper function that loads sound effects Must be called after InitAudioDevice!
+ * Note: sound effects sourced from https://ci.itch.io/arcade-sound-effects-pack
+ * @return map with loaded textures
+ */
+std::unordered_map<std::string, Sound> LoadSounds() {
+    std::unordered_map<const char *, const char *> soundPathMap = {
+        { "move", "resources/move.wav" },
+        { "back", "resources/cancel.wav" } ,
+        { "select", "resources/select.wav" } ,
+        { "prompt", "resources/prompt.wav" },
+        { "start", "resources/start.wav" } ,
+        { "eat", "resources/collect.wav" },
+        { "lose", "resources/lose.wav" },
+        { "win", "resources/win.wav" },
+    };
+    std::unordered_map<std::string, Sound> sounds;
+    for (const auto &[label, path] : soundPathMap) {
+        const Sound s = LoadSound(path);
+        if (!IsSoundValid(s))
+            continue; // If the sound couldn't be loaded, move on
+        sounds[label] = s;
+    }
+    return sounds;
+}
+
+/**
+ * Cleanup helper function that unloads loaded Sounds
+ * @param sounds - reference to map containing Sounds
+ */
+void UnloadSounds(std::unordered_map<std::string, Sound> &sounds) {
+    for (const auto &[label, sound] : sounds) {
+        UnloadSound(sound); // Unload sound to free memory
+    }
+    sounds.clear(); // clear map after finishing
+}
+
+/**
+ * Helper function to look for and play sounds
+ * @param sounds - a reference to sound map
+ * @param name - reference to name of sound to play
+ */
+void PlayMapSound(const std::unordered_map<std::string, Sound> &sounds, const std::string &name) {
+    const auto iterator = sounds.find(name);
+    if (iterator != sounds.end())
+        PlaySound(iterator->second);
+}
 
 /**
  *  * Helper function used to draw centered text
@@ -560,7 +608,8 @@ void DrawHowToPlayContent(Font font) {
  * @param selectedItem reference to item index
  * @param itemCount the count of menu items
  */
-void HandleKeyboardNavigation(int &selectedItem, int itemCount) {
+void HandleKeyboardNavigation(int &selectedItem, int itemCount,
+    std::unordered_map<std::string, Sound> &sounds) {
     // Allow Up navigations with Up or W keys
     if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
         selectedItem = (selectedItem - 1 + itemCount) % itemCount; // Wraparound if before start
@@ -570,13 +619,15 @@ void HandleKeyboardNavigation(int &selectedItem, int itemCount) {
         selectedItem = (selectedItem + 1) % itemCount; // Wraparound if past end
 }
 
+
 /**
  * Helper function used to handle menu navigation via mouse
  * @param menuItems reference to menuItems array
  * @param clicked reference to bool click variable
  * @param selectedItem reference to item index
  */
-void HandleMouseNavigation(const std::vector<MenuItem> &menuItems, bool &clicked, int &selectedItem) {
+void HandleMouseNavigation(const std::vector<MenuItem> &menuItems, bool &clicked, int &selectedItem,
+    std::unordered_map<std::string, Sound> &sounds) {
     const Vector2 mousePos = GetMousePosition();
 
     // Check if mouse has moved to determine focus
@@ -601,12 +652,31 @@ void HandleMouseNavigation(const std::vector<MenuItem> &menuItems, bool &clicked
  * @param selectedMenuItem reference to selected menu item index
  * @return bool indicated whether a highlighted menu item was clicked or Enter was pressed
  */
-bool HandleMenuSelection(const std::vector<MenuItem> &menuItems, int &selectedMenuItem) {
-    HandleKeyboardNavigation(selectedMenuItem, static_cast<int>(menuItems.size()));
-
+bool HandleMenuSelection(const std::vector<MenuItem> &menuItems, int &selectedMenuItem, std::unordered_map<std::string, Sound> &sounds) {
+    const int previousSelectedItem = selectedMenuItem;
+    HandleKeyboardNavigation(selectedMenuItem, static_cast<int>(menuItems.size()), sounds);
     bool clicked = false;
-    HandleMouseNavigation(menuItems, clicked, selectedMenuItem);
-    return clicked || IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_KP_ENTER); // Include keypad enter
+    HandleMouseNavigation(menuItems, clicked, selectedMenuItem, sounds);
+
+    // Play movement sound
+    if (selectedMenuItem != previousSelectedItem)
+        PlayMapSound(sounds, "move");
+
+    bool hasSelection = clicked || IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_KP_ENTER); // Include keypad enter
+
+    // Play selection sound
+    if (hasSelection) {
+        if (menuItems[selectedMenuItem].isBack)
+            PlayMapSound(sounds, "back");
+        else {
+            if (menuItems[selectedMenuItem].label == "Quit")
+                PlayMapSound(sounds, "confirm");
+            else
+                PlayMapSound(sounds, "select");
+        }
+    }
+
+    return hasSelection;
 }
 
 class Snake {
@@ -873,6 +943,14 @@ public:
         return gameOver;
     }
 
+    GameEndType GetGameEndType() const {
+        return gameEndType;
+    }
+
+    bool HasStarted() const {
+        return gameStarted;
+    }
+
     int Score() const {
         return score;
     }
@@ -953,6 +1031,7 @@ int main() {
     const char *subTitle = "A quick, fun classic arcade game";
     SetConfigFlags(FLAG_WINDOW_HIGHDPI); // Looks blurry on dev machine otherwise
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, title);
+    InitAudioDevice();
     ChangeDirectory(GetApplicationDirectory()); // For proper font loading
     SetTargetFPS(TARGET_FPS);
     SetExitKey(KEY_NULL); // Override default
@@ -965,6 +1044,9 @@ int main() {
 
     // Load key textures
     std::unordered_map<std::string, Texture2D> keyTextures = LoadKeyTextures();
+
+    // Load sounds
+    std::unordered_map<std::string, Sound> sounds = LoadSounds();
 
     Screen currentScreen = Screen::StartMenu; // Set start screen to Start Menu
 
@@ -985,7 +1067,7 @@ int main() {
 
     /*** How to Play ***/
     std::vector<MenuItem> howToPlayItems = {
-    {"Back", {} },
+    {"Back", {}, true },
     };
 
     LayoutMenu(howToPlayItems, 470.0f, 200.0f, 52.0f, 0.0f);
@@ -994,7 +1076,7 @@ int main() {
     /*** Game Over ***/
     std::vector<MenuItem> gameOverItems = {
         {"Play Again", {} },
-        {"Start Menu", {} },
+        {"Start Menu", {}, true },
     };
 
     LayoutMenu(gameOverItems, 350.0f, 320.0f, 56.0f, 72.0f);
@@ -1003,7 +1085,7 @@ int main() {
     /*** Quit Prompt ***/
     std::vector<MenuItem> quitPromptItems = {
         {"Yes", {} },
-        {"No", {} }
+        {"No", {}, true }
     };
     LayoutMenu(quitPromptItems, 270.0f, 240.0f, 52.0f, 68.0f);
     int selectedQuitPromptItem = 1;
@@ -1022,7 +1104,7 @@ int main() {
         switch (currentScreen) {
             case Screen::StartMenu: {
                 // Handle User selection
-                if (HandleMenuSelection(startMenuItems, selectedStartMenuItem)) {
+                if (HandleMenuSelection(startMenuItems, selectedStartMenuItem, sounds)) {
                     switch (selectedStartMenuItem) {
                         case 0: {
                             if (game.IsGameOver())
@@ -1040,6 +1122,7 @@ int main() {
                         // }
                         case 2: {
                             selectedQuitPromptItem = 1;
+                            PlayMapSound(sounds, "prompt");
                             currentScreen = Screen::QuitPrompt;
                             break;
                         }
@@ -1054,11 +1137,27 @@ int main() {
                 }
 
                 // Handle input and update game
+                const int prevScore = game.Score();
+                const bool prevStarted = game.HasStarted();
                 game.HandleInput();
+
+                // If game has started, play sound:
+                if (!prevStarted && game.HasStarted())
+                    PlayMapSound(sounds, "start");
+
                 game.Update(dt);
+
+                // If the score went up after update, infer the snake eat and play sound
+                if (game.Score() > prevScore)
+                    PlayMapSound(sounds, "eat");
 
                 // If game end, show Game Over screen
                 if (game.IsGameOver()) {
+                    if (game.GetGameEndType() == GameEndType::BoardFull)
+                        PlayMapSound(sounds, "win");
+                    else
+                        PlayMapSound(sounds, "lose");
+                    PlayMapSound(sounds, "lose");
                     if (game.Score() > highScore)
                         highScore = game.Score();
 
@@ -1067,7 +1166,7 @@ int main() {
             } break;
 
             case Screen::HowToPlay: {
-                if (HandleMenuSelection(howToPlayItems, selectedHowToPlayItem))
+                if (HandleMenuSelection(howToPlayItems, selectedHowToPlayItem, sounds))
                     currentScreen = Screen::StartMenu;
             } break;
 
@@ -1077,7 +1176,7 @@ int main() {
             } break;
 
             case Screen::GameOver: {
-                if (HandleMenuSelection(gameOverItems, selectedGameOverItem)) {
+                if (HandleMenuSelection(gameOverItems, selectedGameOverItem, sounds)) {
                     if (selectedGameOverItem == 0) {
                         game.NewGame();
                         currentScreen = Screen::Gameplay;
@@ -1089,7 +1188,7 @@ int main() {
             } break;
 
             case Screen::QuitPrompt: {
-                if (HandleMenuSelection(quitPromptItems, selectedQuitPromptItem)) {
+                if (HandleMenuSelection(quitPromptItems, selectedQuitPromptItem, sounds)) {
                     if (selectedQuitPromptItem == 0)
                         quitGame = true;
                     else
@@ -1169,6 +1268,7 @@ int main() {
     // Unload resources
     UnloadFont(howToFont);
     UnloadKeyTextures(keyTextures);
+    UnloadSounds(sounds);
     CloseWindow();
 
     return 0;
