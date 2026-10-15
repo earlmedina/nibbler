@@ -39,6 +39,7 @@ constexpr float KEY_PADDING = 8.0f; // Space between key label and its box
 constexpr float HINT_GAP = 6.0f; // Space between hint line parts
 constexpr float HINT_SPACER = 30.0f; // Space inserted for empty string part
 constexpr float HINT_FONT_SIZE = 20.0f;
+constexpr  float HINT_SPACING = 0.5f; // For font spacing with custom font
 
 // Grid Constants
 constexpr int CELL_SIZE = 20;
@@ -134,21 +135,20 @@ namespace Direction {
 
 /**** Hint Lines ****/
 const std::vector<HintPart> MENU_HINT_LINE = {
-    { "Move: ", false }, { "Up", true }, { "Down", true }, { " or ", false },
+    { "Move:", false }, { "Up", true }, { "Down", true }, { "or", false },
     { "W", true },{ "S", true },  {"", false},
-    {"Select: ", false}, { "Enter", true }, { " or ", false }, { "Click", false }
+    {"Select:", false}, { "Enter", true }, { "or", false }, { "Click", false }
 };
 
 const std::vector<HintPart> HOW_TO_PLAY_HINT_LINE = {
-    { "Enter", true }, { "or", false }, { "Click", false },
+    { "Enter", true }, { "or", false }, { "Click: ", false },
     { "Back to Start Menu", false }
 };
 
 const std::vector<HintPart> GAMEPLAY_HINT_LINE = {
-    { "Steer: ", false }, { "Up", true }, { "Left", true }, { "Down", true }, { "Right", true },
-    { " or ", false }, { "W", true }, { "A", true }, { "S", true }, { "D", true },
-    {"", false },
-    { "Hitting a wall ends the game!" }
+    { "Steer:", false }, { "Up", true }, { "Left", true }, { "Down", true }, { "Right", true },
+    { "or", false }, { "W", true }, { "A", true }, { "S", true }, { "D", true },
+    { " | Hitting a wall ends the game!", false }
 };
 
 /**
@@ -308,7 +308,7 @@ float GetKeyWidth(const std::string &keyLabel, const std::unordered_map<std::str
     return GetKeyBoxWidth(keyLabel);
 }
 
-float GetHintPartWidth(const HintPart &part, const std::unordered_map<std::string, Texture2D> &keyTextures) {
+float GetHintPartWidth(const HintPart &part, const std::unordered_map<std::string, Texture2D> &keyTextures, const Font &font) {
     // For empty strings, return spacer.
     if (part.text.empty())
         return HINT_SPACER;
@@ -318,15 +318,15 @@ float GetHintPartWidth(const HintPart &part, const std::unordered_map<std::strin
         return GetKeyWidth(part.text, keyTextures);
 
     // Otherwise, it's plain text so return MeasureText result
-    return static_cast<float>(MeasureText(part.text.c_str(), HINT_FONT_SIZE));
+    return MeasureTextEx(font, part.text.c_str(), HINT_FONT_SIZE, HINT_SPACING).x;
 }
 
-float MeasureHintLine(const std::vector<HintPart> &parts, const std::unordered_map<std::string, Texture2D> &keyTextures) {
+float MeasureHintLine(const std::vector<HintPart> &parts, const std::unordered_map<std::string, Texture2D> &keyTextures, const Font &font) {
     float totalWidth = 0.0f;
     for (size_t i = 0; i < parts.size(); i++) {
         if (i > 0)
             totalWidth += HINT_GAP; // Account for space between hint parts
-        totalWidth += GetHintPartWidth(parts[i], keyTextures);
+        totalWidth += GetHintPartWidth(parts[i], keyTextures, font);
     }
     return totalWidth;
 }
@@ -411,7 +411,7 @@ float DrawKey(const std::unordered_map<std::string, Texture2D> &keyTextures, con
  * @param y  - y position where line should start
  * @return - x position where the line ends
  */
-float DrawHintLine(const std::vector<HintPart> &parts, float x, float y, std::unordered_map<std::string, Texture2D> &keyTextures) {
+float DrawHintLine(const std::vector<HintPart> &parts, float x, float y, std::unordered_map<std::string, Texture2D> &keyTextures, Font &font) {
     for (size_t i = 0; i < parts.size(); i++) {
         const HintPart &part = parts[i]; // reference part
 
@@ -423,9 +423,10 @@ float DrawHintLine(const std::vector<HintPart> &parts, float x, float y, std::un
             if (part.isKey)
                 DrawKey(keyTextures, part.text, x, y);
             else
-                DrawText(part.text.c_str(), static_cast<int>(x), static_cast<int>(y), HINT_FONT_SIZE, LIGHTGRAY);
+                DrawTextEx(font, part.text.c_str(), (Vector2){ roundf(x), roundf(y) }, HINT_FONT_SIZE, HINT_SPACING, LIGHTGRAY);
+                //DrawText(part.text.c_str(), static_cast<int>(x), static_cast<int>(y), HINT_FONT_SIZE, LIGHTGRAY);
         }
-        x += GetHintPartWidth(part, keyTextures);
+        x += GetHintPartWidth(part, keyTextures, font);
     }
     return x;
 }
@@ -434,12 +435,12 @@ float DrawHintLine(const std::vector<HintPart> &parts, float x, float y, std::un
  * Helper function to draw the hint bar footer shown on screens
  * @param hintLine - array of hint parts representing a line to draw
  */
-void DrawHintBar(const std::vector<HintPart> &hintLine, std::unordered_map<std::string, Texture2D> &keyTextures) {
+void DrawHintBar(const std::vector<HintPart> &hintLine, std::unordered_map<std::string, Texture2D> &keyTextures, Font &font) {
     // Draw to separate hint bar from play grid
     DrawLine(0, HINT_BAR_Y, SCREEN_WIDTH, HINT_BAR_Y, Fade(RAYWHITE, 0.5));
-    const float x = (SCREEN_WIDTH - MeasureHintLine(hintLine, keyTextures)) / 2.0f; // Figure out where line should start to be x-centered
+    const float x = (SCREEN_WIDTH - MeasureHintLine(hintLine, keyTextures, font)) / 2.0f; // Figure out where line should start to be x-centered
     const float y = HINT_BAR_Y + (HINT_BAR_HEIGHT - HINT_FONT_SIZE) / 2.0f; // Figure out where line should start to be y-centered
-    DrawHintLine(hintLine, x, y, keyTextures);
+    DrawHintLine(hintLine, x, y, keyTextures, font);
 }
 
 /**
@@ -450,7 +451,7 @@ void DrawHintBar(const std::vector<HintPart> &hintLine, std::unordered_map<std::
  * @param selectedStartMenuItem - selected start menu item index
  */
 void DrawStartMenuScreen(const char *title, const char *subTitle, const std::vector<MenuItem> &startMenuItems,
-    const int selectedStartMenuItem, std::unordered_map<std::string, Texture2D> &keyTextures) {
+    const int selectedStartMenuItem, std::unordered_map<std::string, Texture2D> &keyTextures, Font &font) {
     // Draw title and subtitle
     DrawCenteredText(title, 60, 60, SCREEN_TITLE_COLOR, TextEffect::Bob);
     DrawCenteredText(subTitle, 130, 20, LIGHTGRAY);
@@ -459,7 +460,7 @@ void DrawStartMenuScreen(const char *title, const char *subTitle, const std::vec
     DrawMenuItems(startMenuItems, selectedStartMenuItem);
 
     // Show Hint Bar
-    DrawHintBar(MENU_HINT_LINE, keyTextures);
+    DrawHintBar(MENU_HINT_LINE, keyTextures, font);
 }
 
 /**
@@ -1065,7 +1066,7 @@ int main() {
         // Conditionally render screen as seen in example: https://www.raylib.com/examples/core/loader.html?name=core_basic_screen_manager
         switch (currentScreen) {
             case Screen::StartMenu: {
-                DrawStartMenuScreen(title, subTitle, startMenuItems, selectedStartMenuItem, keyTextures);
+                DrawStartMenuScreen(title, subTitle, startMenuItems, selectedStartMenuItem, keyTextures, howToFont);
             } break;
 
             case Screen::HowToPlay: {
@@ -1076,7 +1077,7 @@ int main() {
                 DrawMenuItems(howToPlayItems, selectedHowToPlayItem);
 
                 // Show Hint Bar
-                DrawHintBar(HOW_TO_PLAY_HINT_LINE, keyTextures);
+                DrawHintBar(HOW_TO_PLAY_HINT_LINE, keyTextures, howToFont);
             } break;
 
             case Screen::Options: {
@@ -1087,7 +1088,7 @@ int main() {
                 game.Draw();
 
                 // Show Hint Bar
-                DrawHintBar(GAMEPLAY_HINT_LINE, keyTextures);
+                DrawHintBar(GAMEPLAY_HINT_LINE, keyTextures, howToFont);
             } break;
 
             case Screen::GameOver: {
@@ -1103,12 +1104,12 @@ int main() {
                 DrawMenuItems(gameOverItems, selectedGameOverItem);
 
                 // Draw hint bar
-                DrawHintBar(MENU_HINT_LINE, keyTextures);
+                DrawHintBar(MENU_HINT_LINE, keyTextures, howToFont);
             } break;
 
             case Screen::QuitPrompt: {
                 // Draw a dimmed start menu in the background
-                DrawStartMenuScreen(title, subTitle, startMenuItems, selectedStartMenuItem, keyTextures);
+                DrawStartMenuScreen(title, subTitle, startMenuItems, selectedStartMenuItem, keyTextures, howToFont);
                 DrawRectangle(0, 0, SCREEN_WIDTH, HINT_BAR_Y, Fade(BLACK, 0.6f));
 
                 // Draw Quit Prompt
