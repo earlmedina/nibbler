@@ -11,6 +11,7 @@
 #include "game.h"
 #include "resources.h"
 #include "snake.h"
+#include "toggle.h"
 #include "ui.h"
 
 
@@ -77,6 +78,27 @@ int main() {
     };
     LayoutMenu(quitPromptItems, 270.0f, 240.0f, 52.0f, 68.0f);
     int selectedQuitPromptItem = 1;
+
+    /*** Options ***/
+    // In order for keyboard navigation to work on Options screen, need to know which row is active
+    // Can add a count value at the end as a simple way to get number of options:
+    // https://stackoverflow.com/questions/2181933/is-there-a-way-to-find-the-cardinality-size-of-an-enum-in-c
+    enum OptionsRow { OPTIONS_SOUND, OPTIONS_SPEED, OPTIONS_BACK, OPTIONS_COUNT };
+    int focusedOptionRow = OPTIONS_SOUND; // First row gets focus
+
+    // Init settings toggles
+    bool soundOn = true; // UPDATE WITH MICROSERVICE LATER
+    ToggleButton soundToggle = { soundOn ? "ON" : "OFF",
+{ 320.0f, 220.0f, 400.0f, 40.0f }, soundOn };
+
+    enum SpeedSetting { SLOW, NORMAL, FAST };
+    int selectedSpeedSetting = NORMAL;  // UPDATE WITH MICROSERVICE LATER
+    ToggleGroup speedToggleGroup = CreateToggleGroup({ "Slow", "Normal", "Fast" },
+{ 320.0f, 340.0f, 400.0f, 40.0f }, selectedSpeedSetting);
+
+    // Back menu item
+    std::vector<MenuItem> optionsMenuItems = { { "Back", {}, true } };
+    LayoutMenu(optionsMenuItems, 470.0f, 200.0f, 52.0f, 0.0f);
 
     /*** Game Vars ***/
     int highScore = 0; /***** placeholder *******/
@@ -145,7 +167,7 @@ int main() {
                         PlayMapSound(sounds, "win");
                     else
                         PlayMapSound(sounds, "lose");
-                    PlayMapSound(sounds, "lose");
+
                     if (game.Score() > highScore)
                         highScore = game.Score();
 
@@ -159,8 +181,57 @@ int main() {
             } break;
 
             case Screen::Options: {
-                if (IsKeyPressed(KEY_ESCAPE) || IsKeyPressed(KEY_BACKSPACE))
+                //*** Handle keyboard row navigation ***
+                const int prevFocusedOptionRow = focusedOptionRow;
+
+                // Upwards navigation with wraparound
+                if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W)) {
+                    focusedOptionRow = (focusedOptionRow - 1 + OPTIONS_COUNT) % OPTIONS_COUNT;
+                }
+                // Downwards navigation with wraparound
+                if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S)) {
+                    focusedOptionRow = (focusedOptionRow + 1) % OPTIONS_COUNT;
+                }
+
+                // Play sound if focus changed
+                if (focusedOptionRow != prevFocusedOptionRow)
+                    PlayMapSound(sounds, "move");
+
+                //*** Handle keyboard selection ***
+                // Allow confirm with Enter or Space
+                const bool hasConfirm = IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_KP_ENTER) || IsKeyPressed(KEY_SPACE);
+
+                // Handle Sound Toggle
+                if (UpdateToggleButton(soundToggle, focusedOptionRow == OPTIONS_SOUND && hasConfirm)) {
+                    soundToggle.label = soundToggle.isToggled ? "ON" : "OFF"; // Change sound toggle label according to isToggled
+                    focusedOptionRow = OPTIONS_SOUND;
+                    PlayMapSound(sounds, "select");
+                }
+
+                // Handle Speed Toggle Group (left/right to navigate group buttons)
+                int shift = 0;
+                if (focusedOptionRow == OPTIONS_SPEED) {
+                    if (IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_A))
+                        shift = -1;
+                    if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D))
+                        shift = 1;
+                }
+
+                if (UpdateToggleGroup(speedToggleGroup, shift)) {
+                    focusedOptionRow = OPTIONS_SPEED;
+                    PlayMapSound(sounds, "select");
+                }
+
+                // Handle Back menu item select
+                const bool backClicked = IsMouseButtonPressed(MOUSE_BUTTON_LEFT) &&
+                    CheckCollisionPointRec(GetMousePosition(), optionsMenuItems[0].rect);
+                // If Back menu item was clicked or selected by keyboard or ESC/BackSpace was keyed, go back to start menu.
+                if ((focusedOptionRow == OPTIONS_BACK && hasConfirm) || backClicked ||
+                    IsKeyPressed(KEY_ESCAPE) || IsKeyPressed(KEY_BACKSPACE)) {
+                    PlayMapSound(sounds, "back");
+                    focusedOptionRow = OPTIONS_SOUND; // Reset focus to first item
                     currentScreen = Screen::StartMenu;
+                }
             } break;
 
             case Screen::GameOver: {
@@ -208,7 +279,29 @@ int main() {
             } break;
 
             case Screen::Options: {
+                DrawCenteredText("Options", 60, 48, SCREEN_TITLE_COLOR);
+                DrawCenteredText("Customize your gaming experience", 130, 20, LIGHTGRAY);
 
+                // DrawText("Sound Effects", 80, static_cast<int>(soundToggle.rect.y + (soundToggle.rect.height - OPTIONS_HEADING_FONT_SIZE) / 2),
+                //     OPTIONS_HEADING_FONT_SIZE, GOLD);
+                DrawText("Sound Effects", 80, static_cast<int>(soundToggle.rect.y) - 20,
+                    OPTIONS_HEADING_FONT_SIZE, GOLD);
+
+                DrawTextLinesEx(80, soundToggle.rect.y + 14.0f, { "Toggle navigation and","gameplay sound effects." }, howToFont);
+
+                DrawToggleButton(soundToggle, focusedOptionRow == OPTIONS_SOUND);
+
+                // DrawText("Snake Speed", 80, static_cast<int>(speedToggleGroup.rect.y + (speedToggleGroup.rect.height - OPTIONS_HEADING_FONT_SIZE) / 2),
+                DrawText("Snake Speed", 80, static_cast<int>(speedToggleGroup.rect.y) - 20,
+                    OPTIONS_HEADING_FONT_SIZE, GOLD);
+                DrawToggleGroup(speedToggleGroup, focusedOptionRow == OPTIONS_SPEED);
+                DrawTextLinesEx(80, speedToggleGroup.rect.y + 14.0f, { "Set the starting snake", "speed." }, howToFont);
+
+
+                // Handle mouse hover highlight on Back menu ite,m
+                bool backHasHover = CheckCollisionPointRec(GetMousePosition(), optionsMenuItems[0].rect);
+                const bool backHighlighted = focusedOptionRow == OPTIONS_BACK || backHasHover;
+                DrawMenuItems(optionsMenuItems, backHighlighted ? 0 : -1);
             } break;
 
             case Screen::Gameplay: {
