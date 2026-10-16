@@ -24,6 +24,7 @@ constexpr float HEADING_FONT_SIZE = 21.0f;
 constexpr float BODY_FONT_SIZE = 17.0f;
 constexpr int BODY_LINE_HEIGHT = 22;
 constexpr float HEADING_SPACING = 1.2f;
+constexpr float OPTIONS_HEADING_FONT_SIZE = 28.0f;
 
 // Hint Bar Constants
 constexpr int HINT_BAR_HEIGHT = 60;
