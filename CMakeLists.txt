@@ -40,6 +40,7 @@ add_executable(nibbler src/main.cpp
         src/game.cpp
         src/ui.cpp
         src/resources.cpp
+        src/toggle.cpp
 )
 
 # set the include directory
