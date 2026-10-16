@@ -34,10 +34,16 @@ else()
     message(STATUS "Using local ${LIB1}")
 endif()
 
-add_executable(nibbler main.cpp)
+add_executable(nibbler src/main.cpp
+        src/snake.cpp
+        src/food.cpp
+        src/game.cpp
+        src/ui.cpp
+        src/resources.cpp
+)
 
 # set the include directory
-target_include_directories(nibbler PRIVATE ${raylib_INCLUDE_DIRS})
+target_include_directories(nibbler PRIVATE ${CMAKE_SOURCE_DIR}/src ${raylib_INCLUDE_DIRS})
 
 # link all libraries to the project
 target_link_libraries(nibbler PRIVATE ${LIB1})
