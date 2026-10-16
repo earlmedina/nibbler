@@ -18,12 +18,13 @@ struct ToggleButton {
 struct ToggleGroup {
     std::vector<ToggleButton> buttons; // toggle buttons that make up group
     int selected = 0; // The index corresponding to the selected toggle button in the group
+    Rectangle rect; // The group Rectangle
 };
 
 ToggleGroup CreateToggleGroup(const std::vector<std::string> &buttonLabels, Rectangle bounds, int selected = 0);
 
-bool UpdateToggleButton(ToggleButton &toggleButton);
-void DrawToggleButton(const ToggleButton &toggleButton);
+bool UpdateToggleButton(ToggleButton &toggleButton, bool hasKeyboardSelect = false);
+void DrawToggleButton(const ToggleButton &toggleButton, bool hasFocus = false);
 
-bool UpdateTogglGroup(ToggleGroup &togglGroup);
-void DrawToggleGroup(const ToggleGroup &toggleGroup);
+bool UpdateToggleGroup(ToggleGroup &toggleGroup, int keyShift = 0);
+void DrawToggleGroup(const ToggleGroup &toggleGroup, bool hasFocus = false);
