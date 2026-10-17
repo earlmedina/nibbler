@@ -5,6 +5,13 @@
 constexpr bool SHOW_LIVE_SCORE = false;
 constexpr bool ENABLE_GROWTH = false;
 
+// Enums
+enum class Screen { StartMenu, HowToPlay, Options, Gameplay, GameOver, QuitPrompt };
+enum class TextEffect { None, Bob, Blink };
+enum class GameEndType { None, WallCollision, SelfCollision, BoardFull };
+enum class MoveResult { Ok, WallCollision, SelfCollision };
+enum SpeedSetting { SPEED_SLOW, SPEED_NORMAL, SPEED_FAST };
+
 // Window Constants
 constexpr int SCREEN_WIDTH = 800;
 constexpr int SCREEN_HEIGHT = 600;
@@ -51,16 +58,6 @@ constexpr Color ALTERNATE_COLOR = { 245, 245, 245, 20 };
 constexpr Color QUIT_PROMPT_COLOR = { 24, 30, 40, 255 };
 
 // Step Constants (for snake movement speed)
-constexpr float INITIAL_STEP_INTERVAL = 0.15f; // Time between drawing steps (higher = slower snake, lower = faster snake)
 constexpr float FOOD_SPEED_BOOST = 0.005f; // Time subtracted from current step time after food is eaten (to make snake go slightly faster and make the game increasingly difficult)
 constexpr float MIN_STEP_INTERVAL = 0.05f; // The minimum time between drawing steps (determines the snake's max speed)
-
-// Enums
-enum class Screen { StartMenu, HowToPlay, Options, Gameplay, GameOver, QuitPrompt };
-enum class TextEffect { None, Bob, Blink };
-enum class GameEndType { None, WallCollision, SelfCollision, BoardFull };
-enum class MoveResult { Ok, WallCollision, SelfCollision };
-enum SpeedSetting { SPPED_SLOW, SPEED_NORMAL, SPEED_FAST };
-
-// Step intervals corresponding to speed setting
-inline constexpr float STEP_INERVALS[] = { 20.0f, 15.0f, 10.0f };
+inline constexpr float STEP_INTERVALS[] = { 20.0f, 15.0f, 10.0f };
