@@ -41,6 +41,7 @@ add_executable(nibbler src/main.cpp
         src/ui.cpp
         src/resources.cpp
         src/toggle.cpp
+        src/options.cpp
 )
 
 # set the include directory

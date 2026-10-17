@@ -55,7 +55,9 @@ constexpr float INITIAL_STEP_INTERVAL = 0.15f; // Time between drawing steps (hi
 constexpr float FOOD_SPEED_BOOST = 0.005f; // Time subtracted from current step time after food is eaten (to make snake go slightly faster and make the game increasingly difficult)
 constexpr float MIN_STEP_INTERVAL = 0.05f; // The minimum time between drawing steps (determines the snake's max speed)
 
+// Enums
 enum class Screen { StartMenu, HowToPlay, Options, Gameplay, GameOver, QuitPrompt };
 enum class TextEffect { None, Bob, Blink };
 enum class GameEndType { None, WallCollision, SelfCollision, BoardFull };
 enum class MoveResult { Ok, WallCollision, SelfCollision };
+

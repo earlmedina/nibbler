@@ -446,3 +446,35 @@ bool HandleMenuSelection(const std::vector<MenuItem> &menuItems, int &selectedMe
 
     return hasSelection;
 }
+
+/**
+ * Used for Options screen to navigate setting rows with Up/Down or W/S
+ * using keyboard and mouse
+ * @param focusedRowIdx - reference to the var holding currently focused row index
+ * @param rowRects - Array of Rectangles corresponding to rows
+ * @return - true if focus changed (used to play sounds)
+ */
+bool UpdateRowFocus(int &focusedRowIdx, const std::vector<Rectangle> &rowRects) {
+    const int rowCount = static_cast<int>(rowRects.size()); // get row count
+    const int prevFocusedRowIdx = focusedRowIdx; // Set prev row to know if there was a change
+
+    // Upwards navigation with wraparound
+    if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W)) {
+        focusedRowIdx = (focusedRowIdx - 1 + rowCount) % rowCount;
+    }
+    // Downwards navigation with wraparound
+    if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S)) {
+        focusedRowIdx = (focusedRowIdx + 1) % rowCount;
+    }
+
+    // Handle mouse movement/focus
+    const Vector2 delta = GetMouseDelta();
+    if (delta.x != 0.0f || delta.y != 0.0f) {
+        const Vector2 mouse = GetMousePosition();
+        for (int i= 0; i < rowCount; i++) {
+            if (CheckCollisionPointRec(mouse, rowRects[i]))
+                focusedRowIdx = i;
+        }
+    }
+    return focusedRowIdx != prevFocusedRowIdx;
+}
