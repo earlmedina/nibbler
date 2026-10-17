@@ -83,8 +83,8 @@ int main() {
     /*** Options ***/
     bool soundOn = true; // UPDATE WITH MICROSERVICE LATER
     SetMasterVolume(soundOn ? 1.0f : 0.0f); // Set master volume pased on user setting
-    
-    int selectedSpeedSetting = NORMAL;  // UPDATE WITH MICROSERVICE LATER
+
+    int selectedSpeedSetting = SPEED_NORMAL;  // UPDATE WITH MICROSERVICE LATER
     OptionsScreen options = CreateOptionsScreen(soundOn, selectedSpeedSetting);
 
     /*** Game Vars ***/
@@ -105,7 +105,7 @@ int main() {
                     switch (selectedStartMenuItem) {
                         case 0: {
                             if (game.IsGameOver())
-                                game.NewGame();
+                                game.NewGame(options.speedGroup.selected);
                             currentScreen = Screen::Gameplay;
                             break;
                         }
