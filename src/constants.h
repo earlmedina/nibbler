@@ -60,4 +60,4 @@ enum class Screen { StartMenu, HowToPlay, Options, Gameplay, GameOver, QuitPromp
 enum class TextEffect { None, Bob, Blink };
 enum class GameEndType { None, WallCollision, SelfCollision, BoardFull };
 enum class MoveResult { Ok, WallCollision, SelfCollision };
-
+enum SpeedSetting { SLOW, NORMAL, FAST };
