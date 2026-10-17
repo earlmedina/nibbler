@@ -60,4 +60,4 @@ constexpr Color QUIT_PROMPT_COLOR = { 24, 30, 40, 255 };
 // Step Constants (for snake movement speed)
 constexpr float FOOD_SPEED_BOOST = 0.005f; // Time subtracted from current step time after food is eaten (to make snake go slightly faster and make the game increasingly difficult)
 constexpr float MIN_STEP_INTERVAL = 0.05f; // The minimum time between drawing steps (determines the snake's max speed)
-inline constexpr float STEP_INTERVALS[] = { 20.0f, 15.0f, 10.0f };
+inline constexpr float STEP_INTERVALS[] = { 0.20f, .15f, .10f }; // Just use a c-array for this
