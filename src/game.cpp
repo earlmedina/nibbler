@@ -10,14 +10,14 @@ Game::Game() {
 /**
  * Sets up new game by resetting fields to default
  */
-void Game::NewGame() {
+void Game::NewGame(int speedSetting) {
     snake.Reset(); // Reset snake position/size
     food.Spawn(snake); // Spawn food
     score = 0; // Reset score
     gameStarted = false; // Reset gameStarted flag
     gameOver = false; // Reset gameOver flag
     gameEndType = GameEndType::None; // Reset game end type
-    stepInterval = INITIAL_STEP_INTERVAL; // Reset to initial step interval
+    stepInterval = STEP_INTERVALS[speedSetting];
     timeSinceStep = 0.0f; // Reset step time
 }
 
