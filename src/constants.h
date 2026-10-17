@@ -60,7 +60,7 @@ enum class Screen { StartMenu, HowToPlay, Options, Gameplay, GameOver, QuitPromp
 enum class TextEffect { None, Bob, Blink };
 enum class GameEndType { None, WallCollision, SelfCollision, BoardFull };
 enum class MoveResult { Ok, WallCollision, SelfCollision };
-enum SpeedSetting { SLOW, NORMAL, FAST };
+enum SpeedSetting { SPPED_SLOW, SPEED_NORMAL, SPEED_FAST };
 
 // Step intervals corresponding to speed setting
 inline constexpr float STEP_INERVALS[] = { 20.0f, 15.0f, 10.0f };
