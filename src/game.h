@@ -29,7 +29,7 @@ private:
     bool gameStarted = false;
     bool gameOver = false;
     GameEndType gameEndType = GameEndType::None;
-    float stepInterval = INITIAL_STEP_INTERVAL;
+    float stepInterval;
     float timeSinceStep = 0.0f;
 
     void Step();
