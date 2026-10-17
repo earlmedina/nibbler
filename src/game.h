@@ -6,7 +6,7 @@
 class Game {
 public:
     Game();
-    void NewGame();
+    void NewGame(int speedSetting = SPEED_NORMAL);
     void HandleInput();
     void Update(float dt);
 
