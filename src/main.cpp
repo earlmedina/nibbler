@@ -104,7 +104,7 @@ int main() {
                 if (HandleMenuSelection(startMenuItems, selectedStartMenuItem, sounds)) {
                     switch (selectedStartMenuItem) {
                         case 0: {
-                            if (game.IsGameOver())
+                            if (game.IsGameOver() || !game.HasStarted())
                                 game.NewGame(options.speedGroup.selected);
                             currentScreen = Screen::Gameplay;
                             break;
@@ -175,7 +175,7 @@ int main() {
             case Screen::GameOver: {
                 if (HandleMenuSelection(gameOverItems, selectedGameOverItem, sounds)) {
                     if (selectedGameOverItem == 0) {
-                        game.NewGame();
+                        game.NewGame(options.speedGroup.selected);
                         currentScreen = Screen::Gameplay;
                     } else {
                         selectedGameOverItem = 0;
