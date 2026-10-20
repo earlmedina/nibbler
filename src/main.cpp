@@ -343,6 +343,11 @@ int main() {
 
             case Screen::CreateProfile: {
                 DrawInitialsScreen(initialsScreen, keyTextures, howToFont);
+                // Draw hint bar
+                if (initialsScreen.canCancel)
+                    DrawHintBar(CREATE_PLAYER_WITH_CANCEL_HINT_LINE, keyTextures, howToFont);
+                else
+                    DrawHintBar(CREATE_PLAYER_NO_CANCEL_HINT_LINE, keyTextures, howToFont);
             } break;
 
             case Screen::ChangePlayer: {
