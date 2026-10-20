@@ -6,7 +6,7 @@ constexpr bool SHOW_LIVE_SCORE = false;
 constexpr bool ENABLE_GROWTH = false;
 
 // Enums
-enum class Screen { StartMenu, HowToPlay, Options, Gameplay, GameOver, QuitPrompt, CreateProfile, ChangePlayer };
+enum class Screen { StartMenu, HowToPlay, Options, Gameplay, GameOver, QuitPrompt, CreateProfile, ChangePlayer, ExistingPlayerPrompt };
 enum class TextEffect { None, Bob, Blink };
 enum class GameEndType { None, WallCollision, SelfCollision, BoardFull };
 enum class MoveResult { Ok, WallCollision, SelfCollision };
@@ -56,6 +56,7 @@ constexpr Color ALTERNATE_COLOR = { 245, 245, 245, 20 };
 
 // Misc
 constexpr Color QUIT_PROMPT_COLOR = { 24, 30, 40, 255 };
+constexpr float EXISTING_PLAYER_MSG_DURATION = 2.0f;
 
 // Step Constants (for snake movement speed)
 constexpr float FOOD_SPEED_BOOST = 0.005f; // Time subtracted from current step time after food is eaten (to make snake go slightly faster and make the game increasingly difficult)
