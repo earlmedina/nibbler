@@ -22,7 +22,7 @@ struct ProfileStore {
 
     static ProfileStore Load(const std::string &filepath);
     void Save(const std::string &filepath);
-    void SelectOrCreate(const std::string &initials);
+    bool SelectOrCreate(const std::string &initials);
     bool CanAddPlayer() const;
 
     PlayerProfile &Current(); // Read/write access

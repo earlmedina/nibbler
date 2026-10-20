@@ -68,15 +68,16 @@ void ProfileStore::Save(const std::string &filepath) {
 }
 
 /**
- * Selects the profile with matching initials or creates it if it doesn't exist.
+    * Selects the profile with matching initials or creates it if it doesn't exist.
  * @param initials - player initials
+ * @return - true if profile was created, false if existing profile was used.
  */
-void ProfileStore::SelectOrCreate(const std::string &initials) {
+bool ProfileStore::SelectOrCreate(const std::string &initials) {
     // Look for profile in store with matching initials and set as current if found
     for (size_t i = 0; i < profiles.size(); i++) {
         if (profiles[i].initials == initials) {
             current = static_cast<int>(i);
-            return;
+            return false;
         }
     }
     // If here, we need to create a profile. Let Player set initials; everything else is default.
@@ -85,6 +86,7 @@ void ProfileStore::SelectOrCreate(const std::string &initials) {
     profiles.push_back(newProfile);
     // Set current to last added profile (the new profile)
     current = static_cast<int>(profiles.size()) - 1;
+    return true;
 }
 
 /**
