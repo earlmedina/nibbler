@@ -324,6 +324,16 @@ int main() {
                 DrawHintBar(MENU_HINT_LINE, keyTextures, howToFont);
             } break;
 
+            case Screen::CreateProfile: {
+                DrawInitialsScreen(initialsScreen, keyTextures, howToFont);
+            } break;
+
+            case Screen::ChangePlayer: {
+                DrawCenteredText("Change Player", 60, 48, SCREEN_TITLE_COLOR);
+                DrawCenteredText("Select a Player profile or add a new one", 130, 24, LIGHTGRAY);
+                DrawMenuItems(playerMenuItems, selectedPlayerMenuItem);
+            } break;
+
             case Screen::QuitPrompt: {
                 // Draw a dimmed start menu in the background
                 DrawStartMenuScreen(title, subTitle, startMenuItems, selectedStartMenuItem, keyTextures, howToFont);
