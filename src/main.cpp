@@ -10,6 +10,8 @@
 #include "food.h"
 #include "game.h"
 #include "options.h"
+#include "profile.h"
+#include "profile_ui.h"
 #include "resources.h"
 #include "snake.h"
 #include "toggle.h"
