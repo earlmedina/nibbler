@@ -210,14 +210,53 @@ int main() {
             } break;
 
             case Screen::Options: {
-                if (UpdateOptionsScreen(options, sounds))
-                    currentScreen = Screen::StartMenu; // Go back if result was true!
+                if (UpdateOptionsScreen(options, sounds)) {
+                    // If settings were updated:
+                    PlayerProfile &p = CurrentProfile(profileStore);
+                    p.soundOn = options.soundToggle.isToggled;
+                    p.speedSetting = options.speedGroup.selected;
+                    SaveProfiles(profileStore, profileDataPath);
+                    currentScreen = Screen::StartMenu;
+                }
+
+            } break;
+
+            case Screen::CreateProfile: {
+                const InitialsResult result = UpdateInitialsScreen(initialsScreen, sounds);
+                if (result == InitialsResult::Submitted) {
+                    SelectOrCreateProfile(profileStore, initialsScreen.text);
+                    SaveProfiles(profileStore, profileDataPath);
+                    ApplySettingsFromProfile(CurrentProfile(profileStore));
+                    currentScreen = Screen::StartMenu;
+                } else if (result == InitialsResult::Canceled) {
+                    currentScreen = Screen::ChangePlayer;
+                }
+            } break;
+
+            case Screen::ChangePlayer: {
+                if (HandleMenuSelection(playerMenuItems, selectedPlayerMenuItem, sounds)) {
+                    const int profileCount = static_cast<int>(profileStore.profiles.size());
+
+                    // Handle profile switch
+                    if (selectedPlayerMenuItem < profileCount) {
+                        profileStore.current = selectedPlayerMenuItem;
+                        SaveProfiles(profileStore, profileDataPath); // Update last used profile
+                        ApplySettingsFromProfile(CurrentProfile(profileStore)); // Update settings from profile
+                        currentScreen = Screen::StartMenu;
+                    } else if (playerMenuItems[selectedPlayerMenuItem].isBack) {
+                        currentScreen = Screen::StartMenu;
+                    } else {
+                        // If not back or existing profile, "Add New Player" was selected
+                        initialsScreen = { "", true }; // reset text and make cancelable
+                        currentScreen = Screen::CreateProfile;
+                    }
+                }
             } break;
 
             case Screen::GameOver: {
                 if (HandleMenuSelection(gameOverItems, selectedGameOverItem, sounds)) {
                     if (selectedGameOverItem == 0) {
-                        game.NewGame(options.speedGroup.selected);
+                        game.NewGame(CurrentProfile(profileStore).speedSetting);
                         currentScreen = Screen::Gameplay;
                     } else {
                         selectedGameOverItem = 0;
