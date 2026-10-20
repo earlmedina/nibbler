@@ -290,6 +290,19 @@ float DrawHintLine(const std::vector<HintPart> &parts, float x, float y, std::un
 }
 
 /**
+ * Same as DrawHintLine, but x-centered
+ * @param parts - array of hint parts
+ * @param y  - y position where line should start
+ * @return - x position where the line ends
+ */
+float DrawCenteredHintLine(const std::vector<HintPart> &parts, float y, std::unordered_map<std::string, Texture2D> &keyTextures, Font &font) {
+    const float centerX = (SCREEN_WIDTH - MeasureHintLine(parts, keyTextures, font)) / 2.0f; // Figure out where line should start to be x-centered
+    return DrawHintLine(parts, centerX, y, keyTextures, font);
+}
+
+
+
+/**
  * Helper function to draw the hint bar footer shown on screens
  * @param hintLine - array of hint parts representing a line to draw
  */

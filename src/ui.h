@@ -37,6 +37,7 @@ float MeasureHintLine(const std::vector<HintPart> &parts, const std::unordered_m
 float DrawKeyBox(const std::string &keyLabel, float x, float y);
 float DrawKey(const std::unordered_map<std::string, Texture2D> &keyTextures, const std::string &keyLabel, float x, float y);
 float DrawHintLine(const std::vector<HintPart> &parts, float x, float y, std::unordered_map<std::string, Texture2D> &keyTextures, Font &font);
+float DrawCenteredHintLine(const std::vector<HintPart> &parts, float y, std::unordered_map<std::string, Texture2D> &keyTextures, Font &font);
 void DrawHintBar(const std::vector<HintPart> &hintLine, std::unordered_map<std::string, Texture2D> &keyTextures, Font &font);
 void DrawStartMenuScreen(const char *title, const char *subTitle, const std::vector<MenuItem> &startMenuItems,
     const int selectedStartMenuItem, std::unordered_map<std::string, Texture2D> &keyTextures, Font &font);
@@ -65,4 +66,14 @@ inline const std::vector<HintPart> GAMEPLAY_HINT_LINE = {
     { "Steer:", false }, { "Up", true }, { "Left", true }, { "Down", true }, { "Right", true },
     { "or", false }, { "W", true }, { "A", true }, { "S", true }, { "D", true },
     { " | Hitting a wall ends the game!", false }
+};
+
+inline const std::vector<HintPart> CREATE_PLAYER_NO_CANCEL_HINT_LINE = {
+    { "Type [a-z]." }, {"Backspace", true}, { "to erase and " },
+    { "Enter", true }, { "to confirm."}
+};
+
+inline const std::vector<HintPart> CREATE_PLAYER_WITH_CANCEL_HINT_LINE = {
+    { "Type [a-z]." }, {"Backspace", true}, { "to erase," },
+    { "Enter", true }, { "to confirm, and"}, { "Esc", true }, {" to cancel." }
 };
