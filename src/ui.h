@@ -82,7 +82,7 @@ inline const std::vector<HintPart> INITIALS_TYPE = {
 };
 
 inline const std::vector<HintPart> CREATE_PLAYER_NO_CANCEL_HINT_LINE = {
-    {"Backspace", true}, { "to erase and " },
+    {"Backspace", true}, { "to erase and" },
     { "Enter", true }, { "to confirm."}
 };
 
