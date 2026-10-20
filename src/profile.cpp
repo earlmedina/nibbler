@@ -10,11 +10,11 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(PlayerProfile, initials,
 
 
 /**
- * Loads Profiles from local json file at specified filepath
+ * ProfileStore static method. Loads Profiles from local json file at specified filepath
  * @param filepath - path to json file
  * @return - ProfileStore
  */
-ProfileStore LoadProfiles(const std::string &filepath) {
+ProfileStore ProfileStore::Load(const std::string &filepath) {
     ProfileStore store; // Create store for holding loaded data
 
     // Try to open json file
@@ -49,18 +49,17 @@ ProfileStore LoadProfiles(const std::string &filepath) {
 }
 
 /**
- * Saves data to local json file for caching/fallback
- * @param store - reference to ProfileStore
+ * ProfileStore method. Saves data to local json file for caching/fallback
  * @param filepath - the path to the JSON file for saving data
  */
-void SaveProfiles(const ProfileStore &store, const std::string &filepath) {
+void ProfileStore::Save(const std::string &filepath) {
     // If there's no profiles to save don't do anything
-    if (store.current < 0)
+    if (current < 0)
         return;
 
     nlohmann::json data; // Init json object to save data
-    data["lastUsed"] = store.profiles[store.current].initials;
-    data["profiles"] = store.profiles; // Save profiles
+    data["lastUsed"] = profiles[current].initials;
+    data["profiles"] = profiles; // Save profiles
 
     // Save json to specified filepath
     std::ofstream file(filepath);
@@ -68,37 +67,47 @@ void SaveProfiles(const ProfileStore &store, const std::string &filepath) {
         file << data.dump(2); // Save indented json
 }
 
-void SelectOrCreateProfile(ProfileStore &store, const std::string &initials) {
+/**
+ * Selects the profile with matching initials or creates it if it doesn't exist.
+ * @param initials - player initials
+ */
+void ProfileStore::SelectOrCreate(const std::string &initials) {
     // Look for profile in store with matching initials and set as current if found
-    for (size_t i = 0; i < store.profiles.size(); i++) {
-        if (store.profiles[i].initials == initials) {
-            store.current = static_cast<int>(i);
+    for (size_t i = 0; i < profiles.size(); i++) {
+        if (profiles[i].initials == initials) {
+            current = static_cast<int>(i);
             return;
         }
     }
     // If here, we need to create a profile. Let Player set initials; everything else is default.
     PlayerProfile newProfile;
     newProfile.initials = initials;
-    store.profiles.push_back(newProfile);
+    profiles.push_back(newProfile);
     // Set current to last added profile (the new profile)
-    store.current = static_cast<int>(store.profiles.size()) - 1;
+    current = static_cast<int>(profiles.size()) - 1;
 }
 
 /**
- * Retrieves profile store with Read/write access.
+ * ProfileStore method that checks if player profile can be added to store
+ * @return true if number of profiles is less than max (5).
+ */
+bool ProfileStore::CanAddPlayer() const {
+    return static_cast<int>(profiles.size()) < MAX_PROFILES;
+}
+
+/**
+ * ProfileStore method that retrieves profile store with Read/write access.
  * Should only be used if a profile exists
- * @param store - reference to profile store
  * @return ProfileStore with r/w access
  */
-PlayerProfile &CurrentProfile(ProfileStore &store) {
-    return store.profiles[store.current];
+PlayerProfile &ProfileStore::Current() {
+    return profiles[current];
 }
 
 /**
- * Retrieves profile store with Read-Only access.
- * @param store - reference to profile store
+ * ProfileStore method that retrieves profile store with Read-Only access.
  * @return ProfileStore with r access
  */
-const PlayerProfile &CurrentProfile(const ProfileStore &store) {
-    return store.profiles[store.current];
+const PlayerProfile &ProfileStore::Current() const {
+    return profiles[current];
 }

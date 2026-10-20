@@ -129,20 +129,11 @@ std::vector<MenuItem> LayoutPlayerMenu(const ProfileStore &store) {
         menuItems.push_back({ p.initials, {} });
 
     // Add "Add New Player" if we're under the max
-    if (CanAddPlayer(store))
+    if (store.CanAddPlayer())
         menuItems.push_back({ "(+) New Player", {} });
 
     // Add "Back" button
     menuItems.push_back({ "Back", {}, true });
     LayoutMenu(menuItems, 200.0f, 320.0f, 44.0f, 54.0f);
     return menuItems;
-}
-
-/**
- * Helper function that checks if player profile can be added to store
- * @param store - reference to ProfileStore
- * @return true if number of profiles is less than max (5).
- */
-bool CanAddPlayer(const ProfileStore &store) {
-    return static_cast<int>(store.profiles.size()) < MAX_PROFILES;
 }

@@ -8,7 +8,6 @@
 
 constexpr int MIN_INITIALS_LENGTH = 2; // Require at least 2 initials
 constexpr int MAX_INITIALS_LENGTH = 3; // Don't allow more than 3 initials
-constexpr int MAX_PROFILES = 5; // Cap at 5 profiles so they can fit on the screen (scroll is beyond scope)
 
 // Struct for initials input.
 struct InitialsScreen {
@@ -22,5 +21,3 @@ InitialsResult UpdateInitialsScreen(InitialsScreen &screen, std::unordered_map<s
 void DrawInitialsScreen(const InitialsScreen &screen, std::unordered_map<std::string, Texture2D> &keyTextures, Font &font);
 
 std::vector<MenuItem> LayoutPlayerMenu(const ProfileStore &store);
-bool CanAddPlayer(const ProfileStore &store);
-
