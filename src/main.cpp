@@ -87,11 +87,13 @@ int main() {
     { "Play", {} },
     { "How to Play", {} },
     { "Options", {} },
+    { "Change Player", {} },
     { "Quit", {} }
     };
 
     // Set placement
-    LayoutMenu(startMenuItems, 220.0f, 320.0f, 56.0f, 72.0f);
+    enum StartMenuOption { START_PLAY, START_HOW_TO, START_OPTIONS, START_CHANGE_PLAYER, START_QUIT }; // Use enum instead of numbers for clarity
+    LayoutMenu(startMenuItems, 200.0f, 320.0f, 46.0f, 60.0f);
     int selectedStartMenuItem = 0; // By default, first item (Play) is selected.
 
     /*** How to Play ***/
@@ -119,18 +121,6 @@ int main() {
     LayoutMenu(quitPromptItems, 270.0f, 240.0f, 52.0f, 68.0f);
     int selectedQuitPromptItem = 1;
 
-    /*** Options ***/
-    bool soundOn = true; // UPDATE WITH MICROSERVICE LATER
-    SetMasterVolume(soundOn ? 1.0f : 0.0f); // Set master volume pased on user setting
-
-    int selectedSpeedSetting = SPEED_NORMAL;  // UPDATE WITH MICROSERVICE LATER
-    OptionsScreen options = CreateOptionsScreen(soundOn, selectedSpeedSetting);
-
-    /*** Game Vars ***/
-    int highScore = 0; /***** placeholder *******/
-    bool quitGame = false;
-    Game game; // Init game
-
     while (!WindowShouldClose() && !quitGame) {
         const float dt = GetFrameTime(); // Passed to game
 
@@ -142,21 +132,27 @@ int main() {
                 // Handle User selection
                 if (HandleMenuSelection(startMenuItems, selectedStartMenuItem, sounds)) {
                     switch (selectedStartMenuItem) {
-                        case 0: {
+                        case START_PLAY: {
                             if (game.IsGameOver() || !game.HasStarted())
-                                game.NewGame(options.speedGroup.selected);
+                                game.NewGame(CurrentProfile(profileStore).speedSetting);
                             currentScreen = Screen::Gameplay;
                             break;
                         }
-                        case 1: {
+                        case START_HOW_TO: {
                             currentScreen = Screen::HowToPlay;
                             break;
                         }
-                        case 2: {
+                        case START_OPTIONS: {
                             currentScreen = Screen::Options;
                             break;
                         }
-                        case 3: {
+                        case START_CHANGE_PLAYER: {
+                            playerMenuItems = LayoutPlayerMenu(profileStore); // Refresh player list
+                            selectedPlayerMenuItem = profileStore.current; // Set selected as current profile
+                            currentScreen = Screen::ChangePlayer;
+                            break;
+                        }
+                        case START_QUIT: {
                             selectedQuitPromptItem = 1;
                             PlayMapSound(sounds, "prompt");
                             currentScreen = Screen::QuitPrompt;
