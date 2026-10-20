@@ -18,7 +18,8 @@ std::unordered_map<std::string, Texture2D> LoadKeyTextures() {
         { "S", "resources/key_s.png" },
         { "D", "resources/key_d.png" },
         { "Enter", "resources/key_enter.png" },
-        { "Backspace", "resources/key_backspace.png" }
+        { "Backspace", "resources/key_backspace.png" },
+        { "Esc", "resources/key_esc.png" }
     };
     std::unordered_map<std::string, Texture2D> textures;
     for (const auto &[label, path] : texturePathMap) {
