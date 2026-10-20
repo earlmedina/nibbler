@@ -314,6 +314,8 @@ int main() {
 
             case Screen::Options: {
                 DrawOptionsScreen(options, howToFont);
+                // Draw hint bar
+                DrawHintBar(OPTIONS_HINT_LINE, keyTextures, howToFont);
             } break;
 
             case Screen::Gameplay: {
@@ -347,6 +349,9 @@ int main() {
                 DrawCenteredText("Change Player", 60, 48, SCREEN_TITLE_COLOR);
                 DrawCenteredText("Select a Player profile or add a new one.", 130, 24, LIGHTGRAY);
                 DrawMenuItems(playerMenuItems, selectedPlayerMenuItem);
+
+                // Draw hint bar
+                DrawHintBar(MENU_HINT_LINE, keyTextures, howToFont);
             } break;
 
             case Screen::ExistingPlayerPrompt: {
