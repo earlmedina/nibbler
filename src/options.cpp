@@ -44,7 +44,7 @@ OptionsScreen CreateOptionsScreen(bool soundOn, int selectedSpeedSetting) {
 { 320.0f, 340.0f, 400.0f, 40.0f }, selectedSpeedSetting);
 
     // Back menu item
-    screen.optionsScreenMenuItems = { { "Back", {}, true } };
+    screen.optionsScreenMenuItems = { { "Back", {}, MenuItemType::Back } };
     LayoutMenu(screen.optionsScreenMenuItems, 470.0f, 200.0f, 52.0f, 0.0f);
     return screen;
 }

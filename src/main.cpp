@@ -94,7 +94,7 @@ int main() {
 
     /*** How to Play ***/
     std::vector<MenuItem> howToPlayItems = {
-    {"Back", {}, true },
+    {"Back", {}, MenuItemType::Back },
     };
 
     LayoutMenu(howToPlayItems, 470.0f, 200.0f, 52.0f, 0.0f);
@@ -103,7 +103,7 @@ int main() {
     /*** Game Over ***/
     std::vector<MenuItem> gameOverItems = {
         {"Play Again", {} },
-        {"Start Menu", {}, true },
+        {"Start Menu", {}, MenuItemType::Back },
     };
 
     LayoutMenu(gameOverItems, 350.0f, 320.0f, 56.0f, 72.0f);
@@ -112,7 +112,7 @@ int main() {
     /*** Quit Prompt ***/
     std::vector<MenuItem> quitPromptItems = {
         {"Yes", {} },
-        {"No", {}, true }
+        {"No", {}, MenuItemType::Back }
     };
     LayoutMenu(quitPromptItems, 270.0f, 240.0f, 52.0f, 68.0f);
     int selectedQuitPromptItem = 1;
@@ -244,7 +244,7 @@ int main() {
                         profileStore.Save(profileDataPath); // Update last used profile
                         ApplySettingsFromProfile(profileStore.Current()); // Update settings from profile
                         currentScreen = Screen::StartMenu;
-                    } else if (playerMenuItems[selectedPlayerMenuItem].isBack) {
+                    } else if (playerMenuItems[selectedPlayerMenuItem].type == MenuItemType::Back) {
                         currentScreen = Screen::StartMenu;
                     } else {
                         // If not back or existing profile, "Add New Player" was selected
@@ -352,7 +352,10 @@ int main() {
 
             case Screen::ChangePlayer: {
                 DrawCenteredText("Change Player", 60, 48, SCREEN_TITLE_COLOR);
-                DrawCenteredText("Select a Player profile or add a new one.", 130, 24, LIGHTGRAY);
+                const char *subtitle = profileStore.CanAddPlayer()
+                    ? "Select a Player profile or add a new one."
+                    : "Select a Player profile.";
+                DrawCenteredText(subtitle, 130, 24, LIGHTGRAY);
                 DrawMenuItems(playerMenuItems, selectedPlayerMenuItem);
 
                 // Draw hint bar

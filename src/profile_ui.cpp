@@ -101,7 +101,7 @@ void DrawInitialsScreen(const InitialsScreen &screen, std::unordered_map<std::st
         if (i < currCursorIdx) {
             // Get current char
             // Note: screen.text[i] return char, so we need to null terminate it
-            const char letter[2] = { screen.text[i], '\0'}; // Init size 2 char array for leter and null term.
+            const char letter[2] = { screen.text[i], '\0'}; // Init size 2 char array for letter and null term.
             const int letterWidth = MeasureText(letter, CHAR_FONT_SIZE); // Get letter width
             DrawText(letter, static_cast<int>(charBox.x + (charBox.width - static_cast<float>(letterWidth)) / 2),
                 static_cast<int>(charBox.y + (charBox.height - CHAR_FONT_SIZE) / 2), CHAR_FONT_SIZE, RAYWHITE);
@@ -121,10 +121,10 @@ std::vector<MenuItem> LayoutPlayerMenu(const ProfileStore &store) {
 
     // Add "Add New Player" if we're under the max
     if (store.CanAddPlayer())
-        menuItems.push_back({ "(+) New Player", {} });
+        menuItems.push_back({ "(+) New Player", {}, MenuItemType::Special });
 
     // Add "Back" button
-    menuItems.push_back({ "Back", {}, true });
+    menuItems.push_back({ "Back", {}, MenuItemType::Back });
     LayoutMenu(menuItems, 200.0f, 320.0f, 44.0f, 54.0f);
     return menuItems;
 }

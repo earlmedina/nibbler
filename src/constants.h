@@ -19,6 +19,7 @@ constexpr int TARGET_FPS = 60;
 
 // Menu Constants
 constexpr Color MENU_ITEM_BASE_COLOR = { 255, 255, 255, 15 };
+constexpr Color MENU_ITEM_SPECIAL_COLOR = Color{ 4, 99, 7, 255 };
 constexpr Color MENU_ITEM_SELECTED_COLOR = { 255, 200, 0, 60 };
 constexpr Color MENU_ITEM_BASE_TEXT_COLOR = RAYWHITE;
 constexpr Color MENU_ITEM_SELECTED_TEXT_COLOR = GOLD;
