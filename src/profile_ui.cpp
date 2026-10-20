@@ -116,9 +116,9 @@ void DrawInitialsScreen(const InitialsScreen &screen, std::unordered_map<std::st
     // DrawCenteredText(hintText, 380, 18, GRAY);
     DrawCenteredHintLine(INITIALS_TYPE, 380, keyTextures, font);
     if (screen.canCancel)
-        DrawCenteredHintLine(CREATE_PLAYER_NO_CANCEL_HINT_LINE, 420, keyTextures, font);
-    else
         DrawCenteredHintLine(CREATE_PLAYER_WITH_CANCEL_HINT_LINE, 420, keyTextures, font);
+    else
+        DrawCenteredHintLine(CREATE_PLAYER_NO_CANCEL_HINT_LINE, 420, keyTextures, font);
 }
 
 std::vector<MenuItem> LayoutPlayerMenu(const ProfileStore &store) {
