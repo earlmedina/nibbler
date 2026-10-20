@@ -8,10 +8,11 @@
 #include "raylib.h"
 
 // Struct used for drawing menu items
+enum class MenuItemType { Base, Back, Special };
 struct MenuItem {
     std::string label;
     Rectangle rect;
-    bool isBack = false; // Used to determine if "back" sound should play
+    MenuItemType type = MenuItemType::Base; // Used to determine if certain behavior should happen
 };
 
 // Struct used to model hint content part
