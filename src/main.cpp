@@ -190,8 +190,15 @@ int main() {
                     else
                         PlayMapSound(sounds, "lose");
 
-                    if (game.Score() > highScore)
-                        highScore = game.Score();
+                    PlayerProfile &p = CurrentProfile(profileStore); // Get current profile
+                    p.gamesPlayed++; // Increment games played
+
+                    // Update player high score
+                    if (game.Score() > p.highScore)
+                        p.highScore = game.Score();
+
+                    // Save profile
+                    SaveProfiles(profileStore, profileDataPath);
 
                     currentScreen = Screen::GameOver;
                 }
