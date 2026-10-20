@@ -93,10 +93,13 @@ void DrawMenuItems(const std::vector<MenuItem> &menuItems, int selectedMenuItem)
     for (size_t i = 0; i < menuItems.size(); i++) {
         Rectangle r = menuItems[i].rect;
         bool isSelected = static_cast<int>(i) == selectedMenuItem;
+        bool isBack = menuItems[i].isBack;
 
-        // Draw menu item container
-        DrawRectangleRounded(r, 0.5f, 10,
-            isSelected ? MENU_ITEM_SELECTED_COLOR : MENU_ITEM_BASE_COLOR);
+        // Draw menu item container - the item is marked as isBack, use a lighter
+        // color to distinguish it.
+        DrawRectangleRounded(r, 0.5f, 8,
+            isSelected ? MENU_ITEM_SELECTED_COLOR : isBack
+                ? DARKGRAY : MENU_ITEM_BASE_COLOR);
 
         // Draw menu item text
         int textWidth = MeasureText(menuItems[i].label.c_str(), MENU_FONT_SIZE);
@@ -488,4 +491,14 @@ bool UpdateRowFocus(int &focusedRowIdx, const std::vector<Rectangle> &rowRects) 
         }
     }
     return focusedRowIdx != prevFocusedRowIdx;
+}
+
+/**
+ * Draws outline around target rect (control's rect). Used for keyboard focus.
+ * @param rect - the Rectangle to draw an outline around
+ */
+void DrawFocusOutline(const Rectangle rect) {
+    const Rectangle outline = { rect.x - FOCUS_GAP, rect.y - FOCUS_GAP,
+        rect.width + 2* FOCUS_GAP, rect.height + 2 * FOCUS_GAP };
+    DrawRectangleRoundedLines(outline, 0.3, 8, TOGGLE_FOCUS_COLOR);
 }

@@ -57,6 +57,8 @@ constexpr Color ALTERNATE_COLOR = { 245, 245, 245, 20 };
 // Misc
 constexpr Color QUIT_PROMPT_COLOR = { 24, 30, 40, 255 };
 constexpr float EXISTING_PLAYER_MSG_DURATION = 2.0f;
+constexpr Color TOGGLE_FOCUS_COLOR = {102, 191, 255, 100 };
+constexpr float FOCUS_GAP = 6.0f;
 
 // Step Constants (for snake movement speed)
 constexpr float FOOD_SPEED_BOOST = 0.005f; // Time subtracted from current step time after food is eaten (to make snake go slightly faster and make the game increasingly difficult)

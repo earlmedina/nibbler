@@ -1,5 +1,6 @@
 #include "toggle.h"
 #include <algorithm>
+#include "ui.h"
 
 // Unnamed namespace used to keep the contained private
 // https://medium.com/@mane.tako/understanding-unnamed-namespaces-in-c-7d41d367fd47
@@ -10,20 +11,6 @@ namespace {
     constexpr float TOGGLE_ROUNDNESS = 0.3f;
     constexpr float TOGGLE_GROUP_BUTTON_GAP = 8.0f;
     constexpr int TOGGLE_FONT_SIZE = 24;
-
-    // Keyboard constants
-    constexpr Color TOGGLE_FOCUS_COLOR = {102, 191, 255, 100 };
-    constexpr float FOCUS_GAP = 6.0f;
-
-    /**
-     * Draws outline around toggle button. Used for keyboard focus.
-     * @param rect - the Rectangle to draw an outline around
-     */
-    void DrawFocusOutline(const Rectangle rect) {
-        const Rectangle outline = { rect.x - FOCUS_GAP, rect.y - FOCUS_GAP,
-            rect.width + 2* FOCUS_GAP, rect.height + 2 * FOCUS_GAP };
-        DrawRectangleRoundedLines(outline, TOGGLE_ROUNDNESS, 8, TOGGLE_FOCUS_COLOR);
-    }
 }
 
 /**

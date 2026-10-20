@@ -110,5 +110,7 @@ void DrawOptionsScreen(const OptionsScreen &screen, const Font &font) {
     DrawOptionLabel("Snake Speed", { "Set the starting snake", "speed." },
         screen.speedGroup.rect, font);
     DrawToggleGroup(screen.speedGroup, screen.focusedRow == OptionsScreen::SPEED);
+    if (screen.focusedRow == OptionsScreen::BACK)
+        DrawFocusOutline(screen.optionsScreenMenuItems[0].rect);
     DrawMenuItems(screen.optionsScreenMenuItems, screen.focusedRow == OptionsScreen::BACK ? 0 : -1);
 }

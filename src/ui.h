@@ -50,6 +50,9 @@ void HandleMouseNavigation(const std::vector<MenuItem> &menuItems, bool &clicked
 bool HandleMenuSelection(const std::vector<MenuItem> &menuItems, int &selectedMenuItem, std::unordered_map<std::string, Sound> &sounds);
 
 bool UpdateRowFocus(int &focusedRowIdx, const std::vector<Rectangle> &rowRects);
+
+void DrawFocusOutline(Rectangle rect);
+
 /**** Hint Lines ****/
 inline const std::vector<HintPart> MENU_HINT_LINE = {
     { "Move:", false }, { "Up", true }, { "Down", true }, { "or", false },
