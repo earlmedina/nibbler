@@ -36,7 +36,7 @@ int main() {
 
     /*** Load local player profiles ***/
     const std::string profileDataPath = "profiles.json";
-    ProfileStore profileStore = LoadProfiles(profileDataPath);
+    ProfileStore profileStore = ProfileStore::Load(profileDataPath);
 
     // On first run with no profiles saved, prompt for initials, else skip to start menu
     Screen currentScreen = profileStore.profiles.empty()
@@ -53,7 +53,7 @@ int main() {
     // the start profile uses default settings else the last used profile
     const PlayerProfile &startProfile = profileStore.profiles.empty()
         ? defaultSettings
-        : CurrentProfile(profileStore);
+        : profileStore.Current();
 
     /*** Options ***/
     // UPDATE WITH MICROSERVICES LATER!!!
@@ -128,7 +128,7 @@ int main() {
                     switch (selectedStartMenuItem) {
                         case START_PLAY: {
                             if (game.IsGameOver() || !game.HasStarted())
-                                game.NewGame(CurrentProfile(profileStore).speedSetting);
+                                game.NewGame(profileStore.Current().speedSetting);
                             currentScreen = Screen::Gameplay;
                             break;
                         }
@@ -184,7 +184,7 @@ int main() {
                     else
                         PlayMapSound(sounds, "lose");
 
-                    PlayerProfile &p = CurrentProfile(profileStore); // Get current profile
+                    PlayerProfile &p = profileStore.Current(); // Get current profile
                     p.gamesPlayed++; // Increment games played
 
                     // Update player high score
@@ -192,7 +192,7 @@ int main() {
                         p.highScore = game.Score();
 
                     // Save profile
-                    SaveProfiles(profileStore, profileDataPath);
+                    profileStore.Save(profileDataPath);
 
                     currentScreen = Screen::GameOver;
                 }
@@ -206,10 +206,10 @@ int main() {
             case Screen::Options: {
                 if (UpdateOptionsScreen(options, sounds)) {
                     // If settings were updated:
-                    PlayerProfile &p = CurrentProfile(profileStore);
+                    PlayerProfile &p = profileStore.Current();
                     p.soundOn = options.soundToggle.isToggled;
                     p.speedSetting = options.speedGroup.selected;
-                    SaveProfiles(profileStore, profileDataPath);
+                    profileStore.Save(profileDataPath);
                     currentScreen = Screen::StartMenu;
                 }
 
@@ -218,9 +218,9 @@ int main() {
             case Screen::CreateProfile: {
                 const InitialsResult result = UpdateInitialsScreen(initialsScreen, sounds);
                 if (result == InitialsResult::Submitted) {
-                    SelectOrCreateProfile(profileStore, initialsScreen.text);
-                    SaveProfiles(profileStore, profileDataPath);
-                    ApplySettingsFromProfile(CurrentProfile(profileStore));
+                    profileStore.SelectOrCreate(initialsScreen.text);
+                    profileStore.Save(profileDataPath);
+                    ApplySettingsFromProfile(profileStore.Current());
                     currentScreen = Screen::StartMenu;
                 } else if (result == InitialsResult::Canceled) {
                     currentScreen = Screen::ChangePlayer;
@@ -234,8 +234,8 @@ int main() {
                     // Handle profile switch
                     if (selectedPlayerMenuItem < profileCount) {
                         profileStore.current = selectedPlayerMenuItem;
-                        SaveProfiles(profileStore, profileDataPath); // Update last used profile
-                        ApplySettingsFromProfile(CurrentProfile(profileStore)); // Update settings from profile
+                        profileStore.Save(profileDataPath); // Update last used profile
+                        ApplySettingsFromProfile(profileStore.Current()); // Update settings from profile
                         currentScreen = Screen::StartMenu;
                     } else if (playerMenuItems[selectedPlayerMenuItem].isBack) {
                         currentScreen = Screen::StartMenu;
@@ -250,7 +250,7 @@ int main() {
             case Screen::GameOver: {
                 if (HandleMenuSelection(gameOverItems, selectedGameOverItem, sounds)) {
                     if (selectedGameOverItem == 0) {
-                        game.NewGame(CurrentProfile(profileStore).speedSetting);
+                        game.NewGame(profileStore.Current().speedSetting);
                         currentScreen = Screen::Gameplay;
                     } else {
                         selectedGameOverItem = 0;
@@ -324,7 +324,7 @@ int main() {
 
             case Screen::ChangePlayer: {
                 DrawCenteredText("Change Player", 60, 48, SCREEN_TITLE_COLOR);
-                DrawCenteredText("Select a Player profile or add a new one", 130, 24, LIGHTGRAY);
+                DrawCenteredText("Select a Player profile or add a new one.", 130, 24, LIGHTGRAY);
                 DrawMenuItems(playerMenuItems, selectedPlayerMenuItem);
             } break;
 
