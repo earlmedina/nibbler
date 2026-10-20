@@ -47,6 +47,8 @@ int main() {
     std::vector<MenuItem> playerMenuItems; // Declare placeholder playerMenuItems
     int selectedPlayerMenuItem = 0; // Select first player profile
 
+    float existingPlayerTimer = 0.0f; // Used to show/dismiss prompt when an existing player is entered
+
     // Get settings to use
     const PlayerProfile defaultSettings; // Declare empty profile which has default settings
     // If there are no profiles (which there should be at this point, so this is a failsafe),
@@ -212,16 +214,21 @@ int main() {
                     profileStore.Save(profileDataPath);
                     currentScreen = Screen::StartMenu;
                 }
-
             } break;
 
             case Screen::CreateProfile: {
                 const InitialsResult result = UpdateInitialsScreen(initialsScreen, sounds);
                 if (result == InitialsResult::Submitted) {
-                    profileStore.SelectOrCreate(initialsScreen.text);
+                    bool profileCreated = profileStore.SelectOrCreate(initialsScreen.text);
                     profileStore.Save(profileDataPath);
                     ApplySettingsFromProfile(profileStore.Current());
-                    currentScreen = Screen::StartMenu;
+                    if (profileCreated) {
+                        currentScreen = Screen::StartMenu;
+                    } else {
+                        existingPlayerTimer = EXISTING_PLAYER_MSG_DURATION;
+                        PlayMapSound(sounds, "prompt");
+                        currentScreen = Screen::ExistingPlayerPrompt;
+                    }
                 } else if (result == InitialsResult::Canceled) {
                     currentScreen = Screen::ChangePlayer;
                 }
@@ -245,6 +252,20 @@ int main() {
                         currentScreen = Screen::CreateProfile;
                     }
                 }
+            } break;
+
+            case Screen::ExistingPlayerPrompt: {
+                // Manual dismiss
+                if (IsKeyPressed(KEY_ESCAPE) || IsKeyPressed(KEY_ENTER) ||
+                    IsKeyPressed(KEY_KP_ENTER) || IsKeyPressed(KEY_SPACE)) {
+                    currentScreen = Screen::StartMenu;
+                    break;
+                }
+
+                // Auto dismiss logic
+                existingPlayerTimer -= dt;
+                if (existingPlayerTimer <= 0.0f)
+                    currentScreen = Screen::StartMenu;
             } break;
 
             case Screen::GameOver: {
@@ -326,6 +347,21 @@ int main() {
                 DrawCenteredText("Change Player", 60, 48, SCREEN_TITLE_COLOR);
                 DrawCenteredText("Select a Player profile or add a new one.", 130, 24, LIGHTGRAY);
                 DrawMenuItems(playerMenuItems, selectedPlayerMenuItem);
+            } break;
+
+            case Screen::ExistingPlayerPrompt: {
+                // Draw dimmed initials screen in background
+                DrawInitialsScreen(initialsScreen, keyTextures, howToFont);
+                DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, Fade(BLACK, 0.6f));
+
+                // Draw prompt
+                const float roundness = 0.1f;
+                const Rectangle dialog = { 200.0f, 190.0f, SCREEN_WIDTH / 2.0f, 200.0f };
+                DrawRectangleRounded(dialog, roundness, 9, QUIT_PROMPT_COLOR);
+                DrawRectangleRoundedLines(dialog, roundness, 8, ORANGE);
+                DrawCenteredText("Player Exists", 216, 36, ORANGE);
+                DrawCenteredText(TextFormat("%s already exists.", initialsScreen.text.c_str()), 276, 24, LIGHTGRAY);
+                DrawCenteredText("Switching to that player.", 310, 24, LIGHTGRAY);
             } break;
 
             case Screen::QuitPrompt: {
