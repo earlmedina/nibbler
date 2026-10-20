@@ -68,12 +68,25 @@ inline const std::vector<HintPart> GAMEPLAY_HINT_LINE = {
     { " | Hitting a wall ends the game!", false }
 };
 
+// inline const std::vector<HintPart> CREATE_PLAYER_NO_CANCEL_HINT_LINE = {
+//     { "Type [a-z]." }, {"Backspace", true}, { "to erase and " },
+//     { "Enter", true }, { "to confirm."}
+// };
+//
+// inline const std::vector<HintPart> CREATE_PLAYER_WITH_CANCEL_HINT_LINE = {
+//     { "Type [a-z]." }, {"Backspace", true}, { "to erase," },
+//     { "Enter", true }, { "to confirm, and"}, { "Esc", true }, {"to cancel." }
+// };
+inline const std::vector<HintPart> INITIALS_TYPE = {
+    { "Type 2-3 initials [a-z]." }
+};
+
 inline const std::vector<HintPart> CREATE_PLAYER_NO_CANCEL_HINT_LINE = {
-    { "Type [a-z]." }, {"Backspace", true}, { "to erase and " },
+    {"Backspace", true}, { "to erase and " },
     { "Enter", true }, { "to confirm."}
 };
 
 inline const std::vector<HintPart> CREATE_PLAYER_WITH_CANCEL_HINT_LINE = {
-    { "Type [a-z]." }, {"Backspace", true}, { "to erase," },
+    {"Backspace", true}, { "to erase," },
     { "Enter", true }, { "to confirm, and"}, { "Esc", true }, {"to cancel." }
 };
