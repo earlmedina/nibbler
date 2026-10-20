@@ -99,7 +99,8 @@ bool UpdateOptionsScreen(OptionsScreen &screen, const std::unordered_map<std::st
 
 void DrawOptionsScreen(const OptionsScreen &screen, const Font &font) {
     DrawCenteredText("Options", 60, 48, SCREEN_TITLE_COLOR);
-    DrawCenteredText("Customize your gaming experience", 130, 20, LIGHTGRAY);
+    DrawCenteredText("Customize your gaming experience.", 130, 20, LIGHTGRAY);
+    //DrawCenteredText("Settings are saved to your player profile.", 150, 20, LIGHTGRAY);
 
     DrawOptionLabel("Sound Effects", { "Toggle navigation and","gameplay sound effects." },
         screen.soundToggle.rect, font);
