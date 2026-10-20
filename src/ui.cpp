@@ -300,8 +300,6 @@ float DrawCenteredHintLine(const std::vector<HintPart> &parts, float y, std::uno
     return DrawHintLine(parts, centerX, y, keyTextures, font);
 }
 
-
-
 /**
  * Helper function to draw the hint bar footer shown on screens
  * @param hintLine - array of hint parts representing a line to draw
