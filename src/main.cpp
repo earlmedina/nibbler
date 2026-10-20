@@ -38,7 +38,44 @@ int main() {
     // Load sounds
     std::unordered_map<std::string, Sound> sounds = LoadSounds();
 
-    Screen currentScreen = Screen::StartMenu; // Set start screen to Start Menu
+    /*** Load local player profiles ***/
+    const std::string profileDataPath = "profiles.json";
+    ProfileStore profileStore = LoadProfiles(profileDataPath);
+
+    // On first run with no profiles saved, prompt for initials, else skip to start menu
+    Screen currentScreen = profileStore.profiles.empty()
+        ? Screen::CreateProfile
+        : Screen::StartMenu;
+
+    InitialsScreen initialsScreen; // Declare InitialsScreen - default canCancel is false!
+    std::vector<MenuItem> playerMenuItems; // Declare placeholder playerMenuItems
+    int selectedPlayerMenuItem = 0; // Select first player profile
+
+    // Get settings to use
+    const PlayerProfile defaultSettings; // Declare empty profile which has default settings
+    // If there are no profiles (which there should be at this point, so this is a failsafe),
+    // the start profile uses default settings else the last used profile
+    const PlayerProfile &startProfile = profileStore.profiles.empty()
+        ? defaultSettings
+        : CurrentProfile(profileStore);
+
+    /*** Options ***/
+    // UPDATE WITH MICROSERVICES LATER!!!
+    SetMasterVolume(startProfile.soundOn ? 1.0f : 0.0f); // Set master volume pased on user setting
+    OptionsScreen options = CreateOptionsScreen(startProfile.soundOn, startProfile.speedSetting);
+
+    /*** Game Vars ***/
+    bool quitGame = false;
+    Game game; // Init game
+
+    // Declare lambda function to update settings if profile is changed
+    // Use [&] to make sure outside options is updated
+    // https://www.w3schools.com/cpp/cpp_functions_lambda.asp
+    auto ApplySettingsFromProfile = [&](const PlayerProfile &p) {
+        options = CreateOptionsScreen(p.soundOn, p.speedSetting); // Update options screen
+        SetMasterVolume(p.soundOn ? 1.0f : 0.0f);
+        game.NewGame(p.speedSetting);
+    };
 
     /************ MENU SETUP ************/
     // Create array to store menu options and then set placement values
