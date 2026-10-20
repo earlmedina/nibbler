@@ -34,6 +34,9 @@ else()
     message(STATUS "Using local ${LIB1}")
 endif()
 
+# JSON lib
+include_dependency(nlohmann_json https://github.com/nlohmann/json.git v3.11.3)
+
 add_executable(nibbler src/main.cpp
         src/snake.cpp
         src/food.cpp
@@ -42,13 +45,15 @@ add_executable(nibbler src/main.cpp
         src/resources.cpp
         src/toggle.cpp
         src/options.cpp
+        src/profile.cpp
+        src/profile_ui.cpp
 )
 
 # set the include directory
 target_include_directories(nibbler PRIVATE ${CMAKE_SOURCE_DIR}/src ${raylib_INCLUDE_DIRS})
 
 # link all libraries to the project
-target_link_libraries(nibbler PRIVATE ${LIB1})
+target_link_libraries(nibbler PRIVATE ${LIB1} nlohmann_json::nlohmann_json)
 
 # Copy resources to build dir
 # https://stackoverflow.com/questions/69890019/what-cmake-command-will-copy-a-directory-of-files-to-a-directory-in-a-post-build
