@@ -6,7 +6,7 @@ constexpr bool SHOW_LIVE_SCORE = true;
 constexpr bool ENABLE_GROWTH = true;
 
 // Enums
-enum class Screen { StartMenu, HowToPlay, Options, Gameplay, GameOver, QuitPrompt, CreateProfile, ChangePlayer, ExistingPlayerPrompt };
+enum class Screen { StartMenu, HowToPlay, Options, Gameplay, GameOver, QuitPrompt, CreateProfile, ChangePlayer, ExistingPlayerPrompt, ViewStats };
 enum class TextEffect { None, Bob, Blink };
 enum class GameEndType { None, WallCollision, SelfCollision, BoardFull };
 enum class MoveResult { Ok, WallCollision, SelfCollision };

@@ -84,21 +84,22 @@ int main() {
     { "How to Play", {} },
     { "Options", {} },
     { "Change Player", {} },
+    { "View Statistics", {} },
     { "Quit", {} }
     };
 
     // Set placement
-    enum StartMenuOption { START_PLAY, START_HOW_TO, START_OPTIONS, START_CHANGE_PLAYER, START_QUIT }; // Use enum instead of numbers for clarity
-    LayoutMenu(startMenuItems, 200.0f, 320.0f, 46.0f, 60.0f);
+    enum StartMenuOption { START_PLAY, START_HOW_TO, START_OPTIONS, START_CHANGE_PLAYER, VIEW_STATS, START_QUIT }; // Use enum instead of numbers for clarity
+    LayoutMenu(startMenuItems, 200.0f, 320.0f, 40.0f, 54.0f);
     int selectedStartMenuItem = 0; // By default, first item (Play) is selected.
 
-    /*** How to Play ***/
-    std::vector<MenuItem> howToPlayItems = {
+    /*** How to Play, View Statistics ***/
+    std::vector<MenuItem> backOnlyItems = {
     {"Back", {}, MenuItemType::Back },
     };
 
-    LayoutMenu(howToPlayItems, 470.0f, 200.0f, 52.0f, 0.0f);
-    int selectedHowToPlayItem = 0;
+    LayoutMenu(backOnlyItems, 470.0f, 200.0f, 52.0f, 0.0f);
+    int selectedBackOnlyItem = 0;
 
     /*** Game Over ***/
     std::vector<MenuItem> gameOverItems = {
@@ -148,6 +149,10 @@ int main() {
                             currentScreen = Screen::ChangePlayer;
                             break;
                         }
+                        case VIEW_STATS: {
+                            currentScreen = Screen::ViewStats;
+                            break;
+                        }
                         case START_QUIT: {
                             selectedQuitPromptItem = 1;
                             PlayMapSound(sounds, "prompt");
@@ -188,6 +193,7 @@ int main() {
 
                     PlayerProfile &p = profileStore.Current(); // Get current profile
                     p.gamesPlayed++; // Increment games played
+                    p.scores.push_back(game.Score());
 
                     // Update player high score
                     if (game.Score() > p.highScore)
@@ -201,7 +207,7 @@ int main() {
             } break;
 
             case Screen::HowToPlay: {
-                if (HandleMenuSelection(howToPlayItems, selectedHowToPlayItem, sounds))
+                if (HandleMenuSelection(backOnlyItems, selectedBackOnlyItem, sounds))
                     currentScreen = Screen::StartMenu;
             } break;
 
@@ -268,6 +274,11 @@ int main() {
                     currentScreen = Screen::StartMenu;
             } break;
 
+            case Screen::ViewStats: {
+                if (HandleMenuSelection(backOnlyItems, selectedBackOnlyItem, sounds))
+                    currentScreen = Screen::StartMenu;
+            } break;
+
             case Screen::GameOver: {
                 if (HandleMenuSelection(gameOverItems, selectedGameOverItem, sounds)) {
                     if (selectedGameOverItem == 0) {
@@ -306,10 +317,10 @@ int main() {
                 DrawHowToPlayContent(howToFont);
 
                 // Draw Back button
-                DrawMenuItems(howToPlayItems, selectedHowToPlayItem);
+                DrawMenuItems(backOnlyItems, selectedBackOnlyItem);
 
                 // Show Hint Bar
-                DrawHintBar(HOW_TO_PLAY_HINT_LINE, keyTextures, howToFont);
+                DrawHintBar(BACK_ONLY_HINT_LINE, keyTextures, howToFont);
             } break;
 
             case Screen::Options: {
@@ -360,6 +371,28 @@ int main() {
 
                 // Draw hint bar
                 DrawHintBar(MENU_HINT_LINE, keyTextures, howToFont);
+            } break;
+
+            case Screen::ViewStats: {
+                DrawCenteredText("Player Statistics", 60, 48, SCREEN_TITLE_COLOR);
+                //const char *subtitle = TextFormat("Current Player: %s ", profileStore.Current().initials.c_str());
+                //DrawCenteredText(subtitle, 130, 24, LIGHTGRAY);
+                DrawCenteredText(profileStore.Current().initials.c_str(), 130, 36, GOLD);
+
+                DrawCenteredText("Total Games Played", 210, 24, MAROON);
+                DrawCenteredText(TextFormat("%d", profileStore.Current().gamesPlayed), 245, 28, ORANGE);
+
+                DrawCenteredText("Average Score", 285, 24, MAROON);
+                DrawCenteredText(TextFormat("%.2f", profileStore.Current().AverageScore()), 320, 28, ORANGE);
+
+                DrawCenteredText("High Score", 360, 24, MAROON);
+                DrawCenteredText(TextFormat("%d", profileStore.Current().highScore), 395, 28, ORANGE);
+
+                // Draw Back button
+                DrawMenuItems(backOnlyItems, selectedBackOnlyItem);
+
+                // Draw hint bar
+                DrawHintBar(BACK_ONLY_HINT_LINE, keyTextures, howToFont);
             } break;
 
             case Screen::ExistingPlayerPrompt: {

@@ -61,7 +61,7 @@ inline const std::vector<HintPart> MENU_HINT_LINE = {
     {"Select:", false}, { "Enter", true }, { "or", false }, { "Click", false }
 };
 
-inline const std::vector<HintPart> HOW_TO_PLAY_HINT_LINE = {
+inline const std::vector<HintPart> BACK_ONLY_HINT_LINE = {
     { "Enter", true }, { "or", false }, { "Click: ", false },
     { "Back to Start Menu", false }
 };
