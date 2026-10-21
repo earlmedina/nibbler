@@ -6,7 +6,7 @@
 
 // Used for to_json and from_json setup: https://stackoverflow.com/questions/75754196/c-question-about-generating-a-simple-json-file-with-library-nlohmann-json
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(PlayerProfile, initials,
-    highScore, gamesPlayed, soundOn, speedSetting)
+    highScore, scores, gamesPlayed, soundOn, speedSetting)
 
 
 /**
@@ -68,7 +68,7 @@ void ProfileStore::Save(const std::string &filepath) {
 }
 
 /**
-    * Selects the profile with matching initials or creates it if it doesn't exist.
+ * Selects the profile with matching initials or creates it if it doesn't exist.
  * @param initials - player initials
  * @return - true if profile was created, false if existing profile was used.
  */
