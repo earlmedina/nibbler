@@ -43,6 +43,22 @@ void DrawCenteredText(const char *text, int y, int fontSize, Color color, TextEf
 }
 
 /**
+ * Draws stacked centered text. Used in Views Statistics screen.
+ * @param heading - heading text
+ * @param content - content text
+ * @param y - the start y value
+ * @param headingFontSize - heading font size
+ * @param contentFontSize - content font size
+ * @param headingColor - heading Color
+ * @param contentColor - content Color
+ */
+void DrawCenteredStatText(const char *heading, const char *content, int y,
+                           int headingFontSize, int contentFontSize, Color headingColor, Color contentColor) {
+    DrawCenteredText(heading, y, headingFontSize, headingColor);
+    DrawCenteredText(content, y + 32, contentFontSize, contentColor);
+}
+
+/**
  * Helper function that draws several lines of text at once
  * @param x x-coord
  * @param y y-coord

@@ -379,14 +379,17 @@ int main() {
                 //DrawCenteredText(subtitle, 130, 24, LIGHTGRAY);
                 DrawCenteredText(profileStore.Current().initials.c_str(), 130, 36, GOLD);
 
-                DrawCenteredText("Total Games Played", 210, 24, MAROON);
-                DrawCenteredText(TextFormat("%d", profileStore.Current().gamesPlayed), 245, 28, ORANGE);
+                DrawCenteredStatText("Total Games Played",
+                    TextFormat("%d", profileStore.Current().gamesPlayed),
+                    200);
 
-                DrawCenteredText("Average Score", 285, 24, MAROON);
-                DrawCenteredText(TextFormat("%.2f", profileStore.Current().AverageScore()), 320, 28, ORANGE);
+                DrawCenteredStatText("Average Score",
+                    TextFormat("%.2f", profileStore.Current().AverageScore()),
+                    290);
 
-                DrawCenteredText("High Score", 360, 24, MAROON);
-                DrawCenteredText(TextFormat("%d", profileStore.Current().highScore), 395, 28, ORANGE);
+                DrawCenteredStatText("High Score",
+                    TextFormat("%d", profileStore.Current().highScore),
+                    385);
 
                 // Draw Back button
                 DrawMenuItems(backOnlyItems, selectedBackOnlyItem);
