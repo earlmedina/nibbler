@@ -83,12 +83,12 @@ int main() {
     { "Play", {} },
     { "How to Play", {} },
     { "Options", {} },
-    { "Change Player", {} },
+    //{ "Change Player", {} },
     { "Quit", {} }
     };
 
     // Set placement
-    enum StartMenuOption { START_PLAY, START_HOW_TO, START_OPTIONS, START_CHANGE_PLAYER, START_QUIT }; // Use enum instead of numbers for clarity
+    enum StartMenuOption { START_PLAY, START_HOW_TO, START_OPTIONS, START_QUIT, START_CHANGE_PLAYER }; // Use enum instead of numbers for clarity
     LayoutMenu(startMenuItems, 200.0f, 320.0f, 46.0f, 60.0f);
     int selectedStartMenuItem = 0; // By default, first item (Play) is selected.
 

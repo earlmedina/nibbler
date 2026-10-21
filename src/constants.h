@@ -2,8 +2,8 @@
 #include "raylib.h"
 
 // For sprint 2
-constexpr bool SHOW_LIVE_SCORE = false;
-constexpr bool ENABLE_GROWTH = false;
+constexpr bool SHOW_LIVE_SCORE = true;
+constexpr bool ENABLE_GROWTH = true;
 
 // Enums
 enum class Screen { StartMenu, HowToPlay, Options, Gameplay, GameOver, QuitPrompt, CreateProfile, ChangePlayer, ExistingPlayerPrompt };
