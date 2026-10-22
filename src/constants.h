@@ -26,6 +26,9 @@ constexpr Color MENU_ITEM_SELECTED_TEXT_COLOR = GOLD;
 constexpr float MENU_FONT_SIZE = 30.0f;
 constexpr float MENU_ITEM_ROUNDNESS = 0.5f;
 constexpr int MENU_ITEM_SEGMENTS = 8;
+constexpr float MENU_ITEM_SPACING = 54.0f;
+constexpr float MENU_ITEM_HEIGHT = 40.0f;
+constexpr float MENU_ITEM_WIDTH = 320.0f;
 
 // Text Constants
 constexpr Color SCREEN_TITLE_COLOR = { 155, 227, 184, 255};

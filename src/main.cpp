@@ -77,10 +77,15 @@ int main() {
 
     /************ MENU SETUP ************/
     // Create array to store menu options and then set placement values
+
     // Load user icon
     Texture2D userIcon = LoadTexture("resources/user.png");
-    Rectangle userIconRect = { SCREEN_WIDTH - 120.0f, 40.0f, static_cast<float>(userIcon.width),
-        static_cast<float>(userIcon.height)};
+
+    // Define rect for icon menu item
+    float startMenuStartY = 172.0f;
+    Rectangle userIconRect = { (static_cast<float>(SCREEN_WIDTH) - static_cast<float>(userIcon.width)) / 2,
+        startMenuStartY, static_cast<float>(userIcon.width), static_cast<float>(userIcon.height)};
+
     /*** Start Menu ***/
     std::vector<MenuItem> startMenuItems = {
     { "Play", {} },
@@ -93,7 +98,8 @@ int main() {
 
     // Set placement
     enum StartMenuOption { START_PLAY, START_HOW_TO, START_OPTIONS, VIEW_STATS, START_QUIT, START_CHANGE_PLAYER }; // Use enum instead of numbers for clarity
-    LayoutMenu(startMenuItems, 200.0f, 320.0f, 40.0f, 54.0f);
+    float startMenuItemsStartY = startMenuStartY + userIconRect.height + MENU_ITEM_SPACING - MENU_ITEM_HEIGHT;
+    LayoutMenu(startMenuItems, startMenuItemsStartY, MENU_ITEM_WIDTH, MENU_ITEM_HEIGHT, MENU_ITEM_SPACING);
     int selectedStartMenuItem = 0; // By default, first item (Play) is selected.
     startMenuItems[startMenuItems.size() - 1].rect = userIconRect;
 

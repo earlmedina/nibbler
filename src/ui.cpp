@@ -127,7 +127,7 @@ void DrawMenuItems(const std::vector<MenuItem> &menuItems, int selectedMenuItem)
             DrawTextureV(item.icon, Vector2{r.x, r.y}, isSelected ? GOLD : LIGHTGRAY);
             // Draw tooltip when focused
             if (isSelected) {
-                Rectangle tooltipRect = { r.x - 130, r.y, 120, 20 };
+                Rectangle tooltipRect = { r.x + 80, r.y + (r.height - 20.0f) / 2, 120, 20 };
                 DrawRectangleRounded(tooltipRect, MENU_ITEM_ROUNDNESS, MENU_ITEM_SEGMENTS, MENU_ITEM_BASE_COLOR);
                 int textWidth = MeasureText(item.label.c_str(), 14);
                 DrawText(item.label.c_str(),

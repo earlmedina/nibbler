@@ -125,7 +125,7 @@ std::vector<MenuItem> LayoutPlayerMenu(const ProfileStore &store) {
 
     // Add "Back" button
     menuItems.push_back({ "Back", {}, MenuItemType::Back });
-    LayoutMenu(menuItems, 200.0f, 320.0f, 44.0f, 54.0f);
+    LayoutMenu(menuItems, 200.0f, MENU_ITEM_WIDTH, 44.0f, 54.0f);
 
     // Overwrite "Back" button startY
     menuItems[menuItems.size() - 1].rect.y = 470.0f;
