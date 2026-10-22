@@ -76,8 +76,18 @@ void DrawTextLines(int x, int y, std::initializer_list<const char *> lines, int 
     }
 }
 
+/**
+ * Variant of DrawTextLines that accepts a Font
+ * @param x x-coord
+ * @param y y-coord
+ * @param lines lines of text as initializer list: https://stackoverflow.com/questions/27753420/initializer-list-vs-vector
+ * @param font - custom Font
+ * @param fontSize font size
+ * @param lineHeight line height (space between lines)
+ * @param color text color
+ */
 void DrawTextLinesEx(float x, float y, std::initializer_list<const char *> lines, const Font &font, float fontSize,
-    float lineHeight, Color color) {
+                     float lineHeight, Color color) {
 
     for (const char *line : lines) {
         //DrawText(line, x, y, fontSize, color);
