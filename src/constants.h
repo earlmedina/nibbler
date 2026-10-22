@@ -24,6 +24,8 @@ constexpr Color MENU_ITEM_SELECTED_COLOR = { 255, 200, 0, 60 };
 constexpr Color MENU_ITEM_BASE_TEXT_COLOR = RAYWHITE;
 constexpr Color MENU_ITEM_SELECTED_TEXT_COLOR = GOLD;
 constexpr float MENU_FONT_SIZE = 30.0f;
+constexpr float MENU_ITEM_ROUNDNESS = 0.5f;
+constexpr int MENU_ITEM_SEGMENTS = 8;
 
 // Text Constants
 constexpr Color SCREEN_TITLE_COLOR = { 155, 227, 184, 255};
