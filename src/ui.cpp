@@ -371,7 +371,7 @@ void DrawHintBar(const std::vector<HintPart> &hintLine, std::unordered_map<std::
  * @param selectedStartMenuItem - selected start menu item index
  */
 void DrawStartMenuScreen(const char *title, const char *subTitle, const std::vector<MenuItem> &startMenuItems,
-    const int selectedStartMenuItem, std::unordered_map<std::string, Texture2D> &keyTextures, Font &font) {
+    int selectedStartMenuItem, std::unordered_map<std::string, Texture2D> &keyTextures, Font &font) {
     // Draw title and subtitle
     DrawCenteredText(title, 60, 60, SCREEN_TITLE_COLOR, TextEffect::Bob);
     DrawCenteredText(subTitle, 130, 20, LIGHTGRAY);

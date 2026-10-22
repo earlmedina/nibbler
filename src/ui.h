@@ -46,7 +46,7 @@ float DrawHintLine(const std::vector<HintPart> &parts, float x, float y, std::un
 float DrawCenteredHintLine(const std::vector<HintPart> &parts, float y, std::unordered_map<std::string, Texture2D> &keyTextures, Font &font);
 void DrawHintBar(const std::vector<HintPart> &hintLine, std::unordered_map<std::string, Texture2D> &keyTextures, Font &font);
 void DrawStartMenuScreen(const char *title, const char *subTitle, const std::vector<MenuItem> &startMenuItems,
-    const int selectedStartMenuItem, std::unordered_map<std::string, Texture2D> &keyTextures, Font &font);
+    int selectedStartMenuItem, std::unordered_map<std::string, Texture2D> &keyTextures, Font &font);
 void DrawHowToPlayContent(Font font);
 
 void HandleKeyboardNavigation(int &selectedItem, int itemCount);
