@@ -13,6 +13,7 @@ struct MenuItem {
     std::string label;
     Rectangle rect;
     MenuItemType type = MenuItemType::Base; // Used to determine if certain behavior should happen
+    Texture2D icon{};
 };
 
 // Struct used to model hint content part
