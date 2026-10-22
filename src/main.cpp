@@ -136,7 +136,6 @@ int main() {
         // Conditionally handle updates by screen as seen in example: https://www.raylib.com/examples/core/loader.html?name=core_basic_screen_manager
         switch (currentScreen) {
             case Screen::StartMenu: {
-
                 // Handle User selection
                 if (HandleMenuSelection(startMenuItems, selectedStartMenuItem, sounds)) {
                     switch (selectedStartMenuItem) {

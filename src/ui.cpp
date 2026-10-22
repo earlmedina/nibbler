@@ -127,28 +127,31 @@ void DrawMenuItems(const std::vector<MenuItem> &menuItems, int selectedMenuItem)
             DrawTextureV(item.icon, Vector2{r.x, r.y}, isSelected ? GOLD : LIGHTGRAY);
             // Draw tooltip when focused
             if (isSelected) {
-                Rectangle tooltipRect = { r.x + 80, r.y + (r.height - 20.0f) / 2, 120, 20 };
+                Rectangle tooltipRect = { r.x + 80, r.y + (r.height - 20.0f) / 2, 144, 30 };
                 DrawRectangleRounded(tooltipRect, MENU_ITEM_ROUNDNESS, MENU_ITEM_SEGMENTS, MENU_ITEM_BASE_COLOR);
-                int textWidth = MeasureText(item.label.c_str(), 14);
+                int textWidth = MeasureText(item.label.c_str(), TOOLTIP_FONT_SIZE);
                 DrawText(item.label.c_str(),
-                    static_cast<int>(tooltipRect.x + (tooltipRect.width - textWidth) / 2),
-                    static_cast<int>(tooltipRect.y + (tooltipRect.height - 14) / 2),
-                    14, RAYWHITE);
+                    static_cast<int>(tooltipRect.x + (tooltipRect.width - static_cast<float>(textWidth)) / 2),
+                    static_cast<int>(tooltipRect.y + (tooltipRect.height - TOOLTIP_FONT_SIZE) / 2),
+                    TOOLTIP_FONT_SIZE, RAYWHITE);
             }
 
 
         } else {
             // Draw menu item container - the item is marked as isBack, use a lighter
             // color to distinguish it, isSpecial is green...
-            DrawRectangleRounded(r, MENU_ITEM_ROUNDNESS, MENU_ITEM_SEGMENTS, isSelected
-                ? MENU_ITEM_SELECTED_COLOR : isBack
-                    ? DARKGRAY : isSpecial
-                        ? MENU_ITEM_SPECIAL_COLOR
-                        : MENU_ITEM_BASE_COLOR);
+            DrawRectangleRounded(r, MENU_ITEM_ROUNDNESS, MENU_ITEM_SEGMENTS,
+                isSelected
+                ? isSpecial
+                    ? MENU_ITEM_SPECIAL_SELECTED_COLOR
+                    : MENU_ITEM_SELECTED_COLOR : isBack
+                        ? DARKGRAY : isSpecial
+                            ? MENU_ITEM_SPECIAL_COLOR
+                            : MENU_ITEM_BASE_COLOR);
             // Draw menu item text
             int textWidth = MeasureText(item.label.c_str(), MENU_FONT_SIZE);
             DrawText(item.label.c_str(),
-                static_cast<int>(r.x + (r.width - textWidth) / 2),
+                static_cast<int>(r.x + (r.width - static_cast<float>(textWidth)) / 2),
                 static_cast<int>(r.y + (r.height - MENU_FONT_SIZE) / 2),
                 MENU_FONT_SIZE,
                 isSelected ? MENU_ITEM_SELECTED_TEXT_COLOR : MENU_ITEM_BASE_TEXT_COLOR);

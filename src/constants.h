@@ -21,6 +21,7 @@ constexpr int TARGET_FPS = 60;
 constexpr Color MENU_ITEM_BASE_COLOR = { 255, 255, 255, 15 };
 constexpr Color MENU_ITEM_SPECIAL_COLOR = Color{ 4, 99, 7, 255 };
 constexpr Color MENU_ITEM_SELECTED_COLOR = { 255, 200, 0, 60 };
+constexpr Color MENU_ITEM_SPECIAL_SELECTED_COLOR { 0, 115, 4, 255 };
 constexpr Color MENU_ITEM_BASE_TEXT_COLOR = RAYWHITE;
 constexpr Color MENU_ITEM_SELECTED_TEXT_COLOR = GOLD;
 constexpr float MENU_FONT_SIZE = 30.0f;
@@ -29,6 +30,7 @@ constexpr int MENU_ITEM_SEGMENTS = 8;
 constexpr float MENU_ITEM_SPACING = 54.0f;
 constexpr float MENU_ITEM_HEIGHT = 40.0f;
 constexpr float MENU_ITEM_WIDTH = 320.0f;
+constexpr int TOOLTIP_FONT_SIZE = 18;
 
 // Text Constants
 constexpr Color SCREEN_TITLE_COLOR = { 155, 227, 184, 255};
