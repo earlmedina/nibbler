@@ -77,21 +77,25 @@ int main() {
 
     /************ MENU SETUP ************/
     // Create array to store menu options and then set placement values
-
+    // Load user icon
+    Texture2D userIcon = LoadTexture("resources/user.png");
+    Rectangle userIconRect = { SCREEN_WIDTH - 120.0f, 40.0f, static_cast<float>(userIcon.width),
+        static_cast<float>(userIcon.height)};
     /*** Start Menu ***/
     std::vector<MenuItem> startMenuItems = {
     { "Play", {} },
     { "How to Play", {} },
     { "Options", {} },
-    { "Change Player", {} },
     { "View Statistics", {} },
-    { "Quit", {} }
+    { "Quit", {} },
+    { "Change Player", {}, MenuItemType::Base, userIcon },
     };
 
     // Set placement
-    enum StartMenuOption { START_PLAY, START_HOW_TO, START_OPTIONS, START_CHANGE_PLAYER, VIEW_STATS, START_QUIT }; // Use enum instead of numbers for clarity
+    enum StartMenuOption { START_PLAY, START_HOW_TO, START_OPTIONS, VIEW_STATS, START_QUIT, START_CHANGE_PLAYER }; // Use enum instead of numbers for clarity
     LayoutMenu(startMenuItems, 200.0f, 320.0f, 40.0f, 54.0f);
     int selectedStartMenuItem = 0; // By default, first item (Play) is selected.
+    startMenuItems[startMenuItems.size() - 1].rect = userIconRect;
 
     /*** How to Play, View Statistics ***/
     std::vector<MenuItem> backOnlyItems = {
@@ -126,6 +130,7 @@ int main() {
         // Conditionally handle updates by screen as seen in example: https://www.raylib.com/examples/core/loader.html?name=core_basic_screen_manager
         switch (currentScreen) {
             case Screen::StartMenu: {
+
                 // Handle User selection
                 if (HandleMenuSelection(startMenuItems, selectedStartMenuItem, sounds)) {
                     switch (selectedStartMenuItem) {
@@ -143,12 +148,6 @@ int main() {
                             currentScreen = Screen::Options;
                             break;
                         }
-                        case START_CHANGE_PLAYER: {
-                            playerMenuItems = LayoutPlayerMenu(profileStore); // Refresh player list
-                            selectedPlayerMenuItem = profileStore.current; // Set selected as current profile
-                            currentScreen = Screen::ChangePlayer;
-                            break;
-                        }
                         case VIEW_STATS: {
                             currentScreen = Screen::ViewStats;
                             break;
@@ -157,6 +156,12 @@ int main() {
                             selectedQuitPromptItem = 1;
                             PlayMapSound(sounds, "prompt");
                             currentScreen = Screen::QuitPrompt;
+                            break;
+                        }
+                        case START_CHANGE_PLAYER: {
+                            playerMenuItems = LayoutPlayerMenu(profileStore); // Refresh player list
+                            selectedPlayerMenuItem = profileStore.current; // Set selected as current profile
+                            currentScreen = Screen::ChangePlayer;
                             break;
                         }
                     }
@@ -367,6 +372,7 @@ int main() {
                     ? "Select a Player profile or add a new one."
                     : "Select a Player profile.";
                 DrawCenteredText(subtitle, 130, 24, LIGHTGRAY);
+                DrawCenteredText(TextFormat("Current Player: %s", profileStore.Current().initials.c_str()), 160, 16, LIGHTGRAY);
                 DrawMenuItems(playerMenuItems, selectedPlayerMenuItem);
 
                 // Draw hint bar
@@ -436,6 +442,7 @@ int main() {
     UnloadFont(howToFont);
     UnloadKeyTextures(keyTextures);
     UnloadSounds(sounds);
+    UnloadTexture(userIcon);
     CloseAudioDevice();
     CloseWindow();
 

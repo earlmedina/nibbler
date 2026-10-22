@@ -117,26 +117,42 @@ void LayoutMenu(std::vector<MenuItem> &menuItems, float startY, float itemWidth,
  */
 void DrawMenuItems(const std::vector<MenuItem> &menuItems, int selectedMenuItem) {
     for (size_t i = 0; i < menuItems.size(); i++) {
-        Rectangle r = menuItems[i].rect;
+        MenuItem item = menuItems[i];
+        Rectangle r = item.rect;
         bool isSelected = static_cast<int>(i) == selectedMenuItem;
-        bool isBack = menuItems[i].type == MenuItemType::Back;
-        bool isSpecial = menuItems[i].type == MenuItemType::Special;
+        bool isBack = item.type == MenuItemType::Back;
+        bool isSpecial = item.type == MenuItemType::Special;
 
-        // Draw menu item container - the item is marked as isBack, use a lighter
-        // color to distinguish it, isSpecial is green...
-        DrawRectangleRounded(r, 0.5f, 8, isSelected
-            ? MENU_ITEM_SELECTED_COLOR : isBack
-                ? DARKGRAY : isSpecial
-                    ? MENU_ITEM_SPECIAL_COLOR
-                    : MENU_ITEM_BASE_COLOR);
+        if (IsTextureValid(item.icon)) {
+            DrawTextureV(item.icon, Vector2{r.x, r.y}, isSelected ? GOLD : LIGHTGRAY);
+            // Draw tooltip when focused
+            if (isSelected) {
+                Rectangle tooltipRect = { r.x - 130, r.y, 120, 20 };
+                DrawRectangleRounded(tooltipRect, MENU_ITEM_ROUNDNESS, MENU_ITEM_SEGMENTS, MENU_ITEM_BASE_COLOR);
+                int textWidth = MeasureText(item.label.c_str(), 14);
+                DrawText(item.label.c_str(),
+                    static_cast<int>(tooltipRect.x + (tooltipRect.width - textWidth) / 2),
+                    static_cast<int>(tooltipRect.y + (tooltipRect.height - 14) / 2),
+                    14, RAYWHITE);
+            }
 
-        // Draw menu item text
-        int textWidth = MeasureText(menuItems[i].label.c_str(), MENU_FONT_SIZE);
-        DrawText(menuItems[i].label.c_str(),
-            static_cast<int>(r.x + (r.width - textWidth) / 2),
-            static_cast<int>(r.y + (r.height - MENU_FONT_SIZE) / 2),
-            MENU_FONT_SIZE,
-            isSelected ? MENU_ITEM_SELECTED_TEXT_COLOR : MENU_ITEM_BASE_TEXT_COLOR);
+
+        } else {
+            // Draw menu item container - the item is marked as isBack, use a lighter
+            // color to distinguish it, isSpecial is green...
+            DrawRectangleRounded(r, MENU_ITEM_ROUNDNESS, MENU_ITEM_SEGMENTS, isSelected
+                ? MENU_ITEM_SELECTED_COLOR : isBack
+                    ? DARKGRAY : isSpecial
+                        ? MENU_ITEM_SPECIAL_COLOR
+                        : MENU_ITEM_BASE_COLOR);
+            // Draw menu item text
+            int textWidth = MeasureText(item.label.c_str(), MENU_FONT_SIZE);
+            DrawText(item.label.c_str(),
+                static_cast<int>(r.x + (r.width - textWidth) / 2),
+                static_cast<int>(r.y + (r.height - MENU_FONT_SIZE) / 2),
+                MENU_FONT_SIZE,
+                isSelected ? MENU_ITEM_SELECTED_TEXT_COLOR : MENU_ITEM_BASE_TEXT_COLOR);
+        }
     }
 }
 
