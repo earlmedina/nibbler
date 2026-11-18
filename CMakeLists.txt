@@ -37,6 +37,20 @@ endif()
 # JSON lib
 include_dependency(nlohmann_json https://github.com/nlohmann/json.git v3.11.3)
 
+# ZeroMQ
+set(ZMQ_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(WITH_PERF_TOOL OFF CACHE BOOL "" FORCE)
+set(BUILD_SHARED OFF CACHE BOOL "" FORCE)
+set(BUILD_STATIC ON CACHE BOOL "" FORCE)
+set(ENABLE_DRAFTS OFF CACHE BOOL "" FORCE)
+FetchContent_Declare(libzmq GIT_REPOSITORY https://github.com/zeromq/libzmq.git GIT_TAG v4.3.5 GIT_SHALLOW TRUE)
+FetchContent_MakeAvailable(libzmq)
+
+set(CPPZMQ_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+FetchContent_Declare(cppzmq GIT_REPOSITORY https://github.com/zeromq/cppzmq.git GIT_TAG v4.10.0 GIT_SHALLOW TRUE)
+FetchContent_MakeAvailable(cppzmq)
+
 add_executable(nibbler src/main.cpp
         src/snake.cpp
         src/food.cpp
@@ -53,7 +67,7 @@ add_executable(nibbler src/main.cpp
 target_include_directories(nibbler PRIVATE ${CMAKE_SOURCE_DIR}/src ${raylib_INCLUDE_DIRS})
 
 # link all libraries to the project
-target_link_libraries(nibbler PRIVATE ${LIB1} nlohmann_json::nlohmann_json)
+target_link_libraries(nibbler PRIVATE ${LIB1} nlohmann_json::nlohmann_json cppzmq-static)
 
 # Copy resources to build dir
 # https://stackoverflow.com/questions/69890019/what-cmake-command-will-copy-a-directory-of-files-to-a-directory-in-a-post-build
