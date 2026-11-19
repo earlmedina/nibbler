@@ -2,6 +2,8 @@
 #include <string>
 #include <vector>
 #include <cmath>
+
+#include "client_utils.h"
 #include "constants.h"
 #include "game.h"
 #include "options.h"
@@ -235,6 +237,15 @@ int main() {
             case Screen::CreateProfile: {
                 const InitialsResult result = UpdateInitialsScreen(initialsScreen, sounds);
                 if (result == InitialsResult::Submitted) {
+                    // Validate Initials with Input Validator Service
+                    const ValidationResult validation_result = ValidateInitials(initialsScreen.text);
+                    if (!validation_result.valid) {
+                       initialsScreen.message = validation_result.message;
+                        initialsScreen.messageTimer = INITIALS_MESSAGE_DURATION;
+                        PlayMapSound(sounds, "back");
+                        break;
+                    }
+
                     bool profileCreated = profileStore.SelectOrCreate(initialsScreen.text);
                     profileStore.Save(profileDataPath);
                     ApplySettingsFromProfile(profileStore.Current());
