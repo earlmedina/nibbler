@@ -38,6 +38,10 @@ namespace {
  * @return InitialsResult
  */
 InitialsResult UpdateInitialsScreen(InitialsScreen &screen, std::unordered_map<std::string, Sound> &sounds) {
+    // Decrement message timer (validation message stops showing when time reaches 0)
+    if (screen.messageTimer > 0.0f)
+        screen.messageTimer -= GetFrameTime();
+
     int key = GetCharPressed(); // Get char pressed
     while (key > 0) {
         // Check if letter key and max 3 chars in length
@@ -53,12 +57,19 @@ InitialsResult UpdateInitialsScreen(InitialsScreen &screen, std::unordered_map<s
         PlayMapSound(sounds, "back"); // Play sound to provide user with feedback
     }
 
-    // Handle submit - initials should be 2-3 characters
-    const bool hasSubmit = IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_KP_ENTER);
-
     const int textLength = static_cast<int>(screen.text.size());
-    // If Enter has been pressed and input is <= max length, return Submitted result
-    if (hasSubmit && textLength >= MIN_INITIALS_LENGTH && textLength <= MAX_INITIALS_LENGTH) {
+
+    // PRE-SERVICE LOGIC
+    // // Handle submit - initials should be 2-3 characters
+    // const bool hasSubmit = IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_KP_ENTER);
+    // // If Enter has been pressed and input is <= max length, return Submitted result
+    // if (hasSubmit && textLength >= MIN_INITIALS_LENGTH && textLength <= MAX_INITIALS_LENGTH) {
+    //     PlayMapSound(sounds, "select");
+    //     return InitialsResult::Submitted;
+    // }
+
+    // Handle submit (Input Validator service checks length)
+    if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_KP_ENTER)) {
         PlayMapSound(sounds, "select");
         return InitialsResult::Submitted;
     }
@@ -107,6 +118,10 @@ void DrawInitialsScreen(const InitialsScreen &screen, std::unordered_map<std::st
                 static_cast<int>(charBox.y + (charBox.height - CHAR_FONT_SIZE) / 2), CHAR_FONT_SIZE, RAYWHITE);
         }
     }
+
+    // Draw validation message if there is one
+    if (screen.messageTimer > 0.0f)
+        DrawCenteredText(screen.message.c_str(), 340, 20, ORANGE);
 
     // Draw basic hint text
     DrawCenteredHintLine(INITIALS_TYPE, 380, keyTextures, font);
