@@ -61,6 +61,7 @@ add_executable(nibbler src/main.cpp
         src/options.cpp
         src/profile.cpp
         src/profile_ui.cpp
+        src/client_utils.cpp
 )
 
 # set the include directory
