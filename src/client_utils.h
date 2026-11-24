@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include "constants.h"
 
 // Struct modeling response from Input Validator service
 struct ValidationResult {
@@ -21,3 +22,5 @@ struct StatisticsResult {
 
 ValidationResult ValidateInitials(const std::string &initials);
 StatisticsResult GetScoreStats(const std::vector<int> &scores);
+std::vector<int> SortDescending(const std::vector<int> &scores);
+std::vector<int> GetTopNScores(const std::vector<int> &scores, int n = TOP_SCORES_COUNT);

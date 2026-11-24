@@ -1,7 +1,9 @@
 #include "client_utils.h"
-#include <algorithm>
-#include <cmath>
-#include <numeric>
+#include <algorithm> // std::sort
+#include <functional> // std:greater
+#include <ranges> // std::ranges
+#include <cmath> // roundf
+#include <numeric> // std::accumulate
 #include <nlohmann/json.hpp>
 #include <zmq.hpp>
 
@@ -10,6 +12,7 @@ namespace {
     constexpr int SERVICE_TIMEOUT_MS = 1000; // Max time to wait for a reply before falling back
     constexpr const char *INPUT_VALIDATOR_SRV_ADDRESS = "tcp://localhost:5555";
     constexpr const char *STATISTICS_SRV_ADDRESS = "tcp://localhost:5655";
+    constexpr const char *SORT_SRV_ADDRESS = "tcp://localhost:5657";
 
     /**
      * https://zeromq.org/get-started/?language=cpp&library=cppzmq#
@@ -61,6 +64,12 @@ namespace {
             static_cast<float>(result.count) * 100.0f) / 100.0f; // 2 decimal places
         result.max = *std::ranges::max_element(scores);
         return result;
+    }
+
+    // Sort Fallback - sort a copy of the score
+    std::vector<int> LocalSortDescending(std::vector<int> scores) {
+        std::sort(scores.begin(), scores.end(), std::greater<>());
+        return scores;
     }
 }
 
@@ -141,4 +150,39 @@ StatisticsResult GetScoreStats(const std::vector<int> &scores) {
     result.max = stats.value("max", 0);
 
     return result;
+}
+
+std::vector<int> SortDescending(const std::vector<int> &scores) {
+    const nlohmann::json request = {
+        {"values", scores},
+        {"direction", "desc" }
+    };
+
+    nlohmann::json reply;
+    // Fallback: unsuccessful request
+    if (!SendRequest(SORT_SRV_ADDRESS, request, reply))
+        return LocalSortDescending(scores);
+
+    // Fallback: malformed request (client-side issue)
+    if (reply.value("status", "") != "ok")
+        return LocalSortDescending(scores);
+
+    // Get sorted values in result with fallback for any uncaught exception
+    try {
+        return reply.at("values").get<std::vector<int>>();
+    } catch (const nlohmann::json::exception &e) {
+        return LocalSortDescending(scores);
+    }
+}
+
+std::vector<int> GetTopNScores(const std::vector<int> &scores, int n) {
+    if (n <= 0 || scores.empty())
+        return {};
+
+    std::vector<int> sorted = SortDescending(scores);
+
+    // Keep only the top n of sorted stores (or keep all if score < n)
+    if (static_cast<int>(sorted.size()) > n)
+        sorted.resize(n); // Simple way to chop off extra values
+    return sorted;
 }
