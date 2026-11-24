@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 // Struct modeling response from Input Validator service
 struct ValidationResult {
@@ -8,10 +9,15 @@ struct ValidationResult {
     std::string message; // Message to show to Player when result is invalid
 };
 
-/**
- * Validate player initials using the Input Validator service,
- * falling back to local rules if the service doesn't respond.
- * @param initials reference to initials
- * @return ValidationResult
- */
+// Struct modeling response from Statistics service
+struct StatisticsResult {
+    int count = 0;
+    int sum = 0;
+    float mean = 0.0f;
+    int median = 0;
+    int min = 0;
+    int max = 0;
+};
+
 ValidationResult ValidateInitials(const std::string &initials);
+StatisticsResult GetScoreStats(const std::vector<int> &scores);

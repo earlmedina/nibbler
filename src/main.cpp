@@ -68,13 +68,17 @@ int main() {
     bool quitGame = false;
     Game game; // Init game
 
+    /*** Player Stats on startup ***/
+    StatisticsResult playerStats = GetScoreStats(startProfile.scores);
+
     // Declare lambda function to update settings if profile is changed
     // Use [&] to make sure outside options is updated
     // https://www.w3schools.com/cpp/cpp_functions_lambda.asp
-    auto ApplySettingsFromProfile = [&](const PlayerProfile &p) {
+    auto ApplyProfile = [&](const PlayerProfile &p) {
         options = CreateOptionsScreen(p.soundOn, p.speedSetting); // Update options screen
         SetMasterVolume(p.soundOn ? 1.0f : 0.0f);
         game.NewGame(p.speedSetting);
+        playerStats = GetScoreStats(p.scores); // refresh player stats
     };
 
     /************ MENU SETUP ************/
@@ -213,6 +217,7 @@ int main() {
 
                     // Save profile
                     profileStore.Save(profileDataPath);
+                    playerStats = GetScoreStats(p.scores);
 
                     currentScreen = Screen::GameOver;
                 }
@@ -248,7 +253,7 @@ int main() {
 
                     bool profileCreated = profileStore.SelectOrCreate(initialsScreen.text);
                     profileStore.Save(profileDataPath);
-                    ApplySettingsFromProfile(profileStore.Current());
+                    ApplyProfile(profileStore.Current());
                     if (profileCreated) {
                         currentScreen = Screen::StartMenu;
                     } else {
@@ -269,7 +274,7 @@ int main() {
                     if (selectedPlayerMenuItem < profileCount) {
                         profileStore.current = selectedPlayerMenuItem;
                         profileStore.Save(profileDataPath); // Update last used profile
-                        ApplySettingsFromProfile(profileStore.Current()); // Update settings from profile
+                        ApplyProfile(profileStore.Current()); // Update settings from profile
                         currentScreen = Screen::StartMenu;
                     } else if (playerMenuItems[selectedPlayerMenuItem].type == MenuItemType::Back) {
                         currentScreen = Screen::StartMenu;
@@ -402,15 +407,15 @@ int main() {
                 DrawCenteredText(profileStore.Current().initials.c_str(), 130, 36, GOLD);
 
                 DrawCenteredStatText("Total Games Played",
-                    TextFormat("%d", profileStore.Current().gamesPlayed),
+                    TextFormat("%d", playerStats.count),
                     200);
 
                 DrawCenteredStatText("Average Score",
-                    TextFormat("%.2f", profileStore.Current().AverageScore()),
+                    TextFormat("%.2f", playerStats.mean),
                     290);
 
                 DrawCenteredStatText("High Score",
-                    TextFormat("%d", profileStore.Current().highScore),
+                    TextFormat("%d", playerStats.max),
                     385);
 
                 // Draw Back button
