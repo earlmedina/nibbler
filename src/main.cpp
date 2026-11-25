@@ -70,6 +70,7 @@ int main() {
 
     /*** Player Stats on startup ***/
     StatisticsResult playerStats = GetScoreStats(startProfile.scores);
+    std::vector<int> topScores = GetTopNScores(startProfile.scores);
 
     // Declare lambda function to update settings if profile is changed
     // Use [&] to make sure outside options is updated
@@ -79,6 +80,7 @@ int main() {
         SetMasterVolume(p.soundOn ? 1.0f : 0.0f);
         game.NewGame(p.speedSetting);
         playerStats = GetScoreStats(p.scores); // refresh player stats
+        topScores = GetTopNScores(startProfile.scores);
     };
 
     /************ MENU SETUP ************/
@@ -218,6 +220,7 @@ int main() {
                     // Save profile
                     profileStore.Save(profileDataPath);
                     playerStats = GetScoreStats(p.scores);
+                    topScores = GetTopNScores(startProfile.scores);
 
                     currentScreen = Screen::GameOver;
                 }
@@ -406,17 +409,23 @@ int main() {
                 //DrawCenteredText(subtitle, 130, 24, LIGHTGRAY);
                 DrawCenteredText(profileStore.Current().initials.c_str(), 130, 36, GOLD);
 
-                DrawCenteredStatText("Total Games Played",
+                int col1 = SCREEN_WIDTH / 4;
+                DrawCenteredStatTextAtX("Total Games Played",
                     TextFormat("%d", playerStats.count),
-                    200);
+                    col1, 200);
 
-                DrawCenteredStatText("Average Score",
+                DrawCenteredStatTextAtX("Average Score",
                     TextFormat("%.2f", playerStats.mean),
-                    290);
+                    col1, 290);
 
-                DrawCenteredStatText("High Score",
+                DrawCenteredStatTextAtX("High Score",
                     TextFormat("%d", playerStats.max),
-                    385);
+                    col1, 385);
+
+                int col2 = SCREEN_WIDTH - (SCREEN_WIDTH / 4);
+                DrawCenteredTopScoresAtX("Best 5 Scores",
+                    topScores,
+                    col2, 200);
 
                 // Draw Back button
                 DrawMenuItems(backOnlyItems, selectedBackOnlyItem);
