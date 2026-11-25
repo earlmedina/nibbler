@@ -3,53 +3,78 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include "constants.h"
+#include "client_utils.h"
 
 // Used for to_json and from_json setup: https://stackoverflow.com/questions/75754196/c-question-about-generating-a-simple-json-file-with-library-nlohmann-json
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(PlayerProfile, initials,
     highScore, scores, gamesPlayed, soundOn, speedSetting)
 
+// Unnamed namespace for private data
+namespace {
+    constexpr const char *PROFILE_STORE_KEY = "nibbler.profiles";
+
+    /**
+     * Creates a ProfileStore from JSON
+     * @param data reference to json data
+     * @return - ProfileStore
+     */
+    ProfileStore StoreFromJSON(const nlohmann::json &data) {
+        ProfileStore store; // Create store for holding loaded data
+
+        try {
+            // Try to load profile data, falling back to empty array if there's nothing
+            store.profiles = data.value("profiles", std::vector<PlayerProfile>{});
+            const std::string lastUsed = data.value("lastUsed", ""); // Try to load lastUsed profile
+            for (size_t i = 0; i < store.profiles.size(); i++) {
+                PlayerProfile &p = store.profiles[i];
+                // High unlikely it won't be 0-2, but clamp speed setting when loading to be safe
+                p.speedSetting = std::clamp(p.speedSetting, static_cast<int>(SPEED_SLOW), static_cast<int>(SPEED_FAST));
+
+                // If the lastUsed property matches profile initials, set the ProfileStore current index to that profile.
+                if (p.initials == lastUsed)
+                    store.current = static_cast<int>(i);
+            }
+        } catch (const nlohmann::json::exception &e) {
+            // Using json::exception for general use: https://stackoverflow.com/questions/76171241/which-exception-should-be-caught-for-nlohmannjsonto-cbor
+            // More info on json exception handling: https://stackoverflow.com/questions/78707025/how-to-handle-nlohmann-exception-type-error-in-a-readable-way
+            return ProfileStore{}; // Return empty store if there's an exception
+        }
+
+        // If there's no current (i.e., val is -1) fall back to first profile in store (if there are profiles)
+        if (store.current == -1 && !store.profiles.empty())
+            store.current = 0;
+        return store;
+    }
+}
+
 
 /**
- * ProfileStore static method. Loads Profiles from local json file at specified filepath
- * @param filepath - path to json file
+ * Loads Profiles via request to KeyStore service. Falls back to local JSON.
+ * @param filepath - path to json file in case of fallback
  * @return - ProfileStore
  */
 ProfileStore ProfileStore::Load(const std::string &filepath) {
-    ProfileStore store; // Create store for holding loaded data
+    nlohmann::json data;
 
-    // Try to open json file
-    std::ifstream file(filepath);
-    if (!file)
-        return store; // Return empty store if there's nothing at specified path
+    if (!GetStoreValue(PROFILE_STORE_KEY, data)) {
+        // If we can't get profile data from service, try to fallback on local json
 
-    try {
-        const nlohmann::json data = nlohmann::json::parse(file); // Parse json from file
-        // Try to load profile data, falling back to empty array if there's nothing
-        store.profiles = data.value("profiles", std::vector<PlayerProfile>{});
-        const std::string lastUsed = data.value("lastUsed", ""); // Try to load lastUsed profile
-        for (size_t i = 0; i < store.profiles.size(); i++) {
-            PlayerProfile &p = store.profiles[i];
-            // High unlikely it won't be 0-2, but clamp speed setting when loading to be safe
-            p.speedSetting = std::clamp(p.speedSetting, static_cast<int>(SPEED_SLOW), static_cast<int>(SPEED_FAST));
-
-            // If the lastUsed property matches profile initials, set the ProfileStore current index to that profile.
-            if (p.initials == lastUsed)
-                store.current = static_cast<int>(i);
+        // Try to open json file
+        std::ifstream file(filepath);
+        if (!file)
+            return ProfileStore{}; // Return empty store if there's nothing at specified path
+        try {
+            data = nlohmann::json::parse(file); // Parse json from file
+        } catch (const nlohmann::json::exception &e) {
+            // If there's an exception, return an empty store
+            return ProfileStore{};
         }
-    } catch (const nlohmann::json::exception &e) {
-        // Using json::exception for general use: https://stackoverflow.com/questions/76171241/which-exception-should-be-caught-for-nlohmannjsonto-cbor
-        // More info on json exception handling: https://stackoverflow.com/questions/78707025/how-to-handle-nlohmann-exception-type-error-in-a-readable-way
-        return ProfileStore{}; // Return empty store if there's an exception
     }
-
-    // If there's no current (i.e., val is -1) fall back to first profile in store (if there are profiles)
-    if (store.current == -1 && !store.profiles.empty())
-        store.current = 0;
-    return store;
+    return StoreFromJSON(data);
 }
 
 /**
- * ProfileStore method. Saves data to local json file for caching/fallback
+ * Saves data to local json file for caching/fallback
  * @param filepath - the path to the JSON file for saving data
  */
 void ProfileStore::Save(const std::string &filepath) {
@@ -61,7 +86,9 @@ void ProfileStore::Save(const std::string &filepath) {
     data["lastUsed"] = profiles[current].initials;
     data["profiles"] = profiles; // Save profiles
 
-    // Save json to specified filepath
+    SetStoreValue(PROFILE_STORE_KEY, data); // Save profiles on server
+
+    // Save local json to specified filepath (for fallback)
     std::ofstream file(filepath);
     if (file)
         file << data.dump(2); // Save indented json

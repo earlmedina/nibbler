@@ -13,6 +13,7 @@ namespace {
     constexpr const char *INPUT_VALIDATOR_SRV_ADDRESS = "tcp://localhost:5555";
     constexpr const char *STATISTICS_SRV_ADDRESS = "tcp://localhost:5655";
     constexpr const char *SORT_SRV_ADDRESS = "tcp://localhost:5657";
+    constexpr const char *KEYSTORE_SRV_ADDRESS = "tcp://localhost:5656";
 
     /**
      * https://zeromq.org/get-started/?language=cpp&library=cppzmq#
@@ -185,4 +186,52 @@ std::vector<int> GetTopNScores(const std::vector<int> &scores, int n) {
     if (static_cast<int>(sorted.size()) > n)
         sorted.resize(n); // Simple way to chop off extra values
     return sorted;
+}
+
+/**
+ * Get the value for the specified key from the Key-Store Service
+ * @param key name of key to query on
+ * @param value reference to json object used to hold result
+ * @return true if successful, otherwise false
+ */
+bool GetStoreValue(const std::string &key, nlohmann::json &value) {
+    const nlohmann::json request = {
+        {"action", "get"},
+        {"key", key }
+    };
+
+    nlohmann::json reply;
+    if (!SendRequest(KEYSTORE_SRV_ADDRESS, request, reply))
+        return false;
+
+    // Fallback: malformed request or key not found
+    if (reply.value("status", "") != "ok" || !reply.contains("value"))
+        return false;
+
+    value = reply["value"];
+    return true;
+}
+
+/**
+ * Set the value for the specified key from the Key-Store Service
+ * @param key the name of the key to set
+ * @param value reference to json object holding value to set
+ * @return rue if successful, otherwise false
+ */
+bool SetStoreValue(const std::string &key, const nlohmann::json &value) {
+    const nlohmann::json request = {
+        {"action", "set"},
+        {"key", key },
+        {"value", value }
+    };
+
+    nlohmann::json reply;
+    if (!SendRequest(KEYSTORE_SRV_ADDRESS, request, reply))
+        return false;
+
+    // Fallback: malformed request or key not found
+    if (reply.value("status", "") != "ok" || !reply.contains("value"))
+        return false;
+
+    return true;
 }
