@@ -11,7 +11,7 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(PlayerProfile, initials,
 
 // Unnamed namespace for private data
 namespace {
-    constexpr const char *PROFILE_STORE_KEY = "nibbler.profiles";
+    constexpr const char *PROFILE_STORE_KEY = "nibbler.data";
 
     /**
      * Creates a ProfileStore from JSON
