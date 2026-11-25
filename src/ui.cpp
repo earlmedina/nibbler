@@ -1,7 +1,3 @@
-//
-// Created by Earl Medina on 10/15/26.
-//
-
 #include "ui.h"
 #include "constants.h"
 #include "raylib.h"
