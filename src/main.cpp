@@ -80,7 +80,7 @@ int main() {
         SetMasterVolume(p.soundOn ? 1.0f : 0.0f);
         game.NewGame(p.speedSetting);
         playerStats = GetScoreStats(p.scores); // refresh player stats
-        topScores = GetTopNScores(startProfile.scores);
+        topScores = GetTopNScores(p.scores);
     };
 
     /************ MENU SETUP ************/
@@ -220,7 +220,7 @@ int main() {
                     // Save profile
                     profileStore.Save(profileDataPath);
                     playerStats = GetScoreStats(p.scores);
-                    topScores = GetTopNScores(startProfile.scores);
+                    topScores = GetTopNScores(p.scores);
 
                     currentScreen = Screen::GameOver;
                 }
