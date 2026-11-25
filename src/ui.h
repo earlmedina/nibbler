@@ -27,6 +27,12 @@ void DrawCenteredText(const char *text, int y, int fontSize, Color color, TextEf
 void DrawCenteredStatText(const char *heading, const char *content, int y,
     int headingFontSize = 24, int contentFontSize = 28, Color headingColor = PINK, Color contentColor = ORANGE);
 
+void DrawCenteredStatTextAtX(const char *heading, const char *content, int x, int y,
+    int headingFontSize = 24, int contentFontSize = 28, Color headingColor = PINK, Color contentColor = ORANGE);
+
+void DrawCenteredTopScoresAtX(const char *heading, const std::vector<int> &topScores, int x, int y,
+    int headingFontSize = 24, int contentFontSize = 28, Color headingColor = PINK, Color contentColor = ORANGE);
+
 void DrawTextLines(int x, int y, std::initializer_list<const char *> lines, int fontSize = BODY_FONT_SIZE,
     float lineHeight = BODY_LINE_HEIGHT, Color color = RAYWHITE);
 

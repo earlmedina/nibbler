@@ -59,6 +59,53 @@ void DrawCenteredStatText(const char *heading, const char *content, int y,
 }
 
 /**
+ * Draws stacked text centered at the specified x value. Used in Views Statistics screen.
+ * @param heading - heading text
+ * @param content - content text to show centered under heading
+ * @param x - the x value to center start text around
+ * @param y - the y value at which to start drawing stat text
+ * @param headingFontSize - heading font size
+ * @param contentFontSize - content font size
+ * @param headingColor - heading Color
+ * @param contentColor - content Color
+ */
+void DrawCenteredStatTextAtX(const char *heading, const char *content, int x, int y,
+    int headingFontSize, int contentFontSize, Color headingColor, Color contentColor) {
+    int headingWidth = MeasureText(heading, headingFontSize);
+    int headingX = x - (headingWidth / 2);
+    DrawText(heading, headingX, y, headingFontSize, headingColor);
+    int contentStartX = headingX + ((MeasureText(heading, headingFontSize) - MeasureText(content, contentFontSize)) / 2);
+    DrawText(content, contentStartX, y + 32, contentFontSize, contentColor);
+}
+
+/**
+ * Draws stacked centered text. Used in Views Statistics screen.
+ * @param heading - heading text
+ * @param topScores - top scores vector
+ * @param x - the x value to center start text around
+ * @param y - the y value at which to start drawing score text
+ * @param headingFontSize - heading font size
+ * @param contentFontSize - content font size
+ * @param headingColor - heading Color
+ * @param contentColor - content Color
+ */
+void DrawCenteredTopScoresAtX(const char *heading, const std::vector<int> &topScores, int x, int y,
+    int headingFontSize, int contentFontSize, Color headingColor, Color contentColor) {
+    int headingWidth = MeasureText(heading, headingFontSize);
+    int headingX = x - (headingWidth / 2);
+    DrawText(heading, headingX, y, headingFontSize, headingColor);
+
+    int scoreY = y + 32;
+    for (const int& score : topScores) {
+        std::string scoreStr = std::to_string(score);
+        const char *scoreChar = scoreStr.c_str();
+        int contentStartX = headingX + ((MeasureText(heading, headingFontSize) - MeasureText(scoreChar, contentFontSize)) / 2);
+        DrawText(scoreChar, contentStartX, scoreY, contentFontSize, contentColor);
+        scoreY += 46;
+    }
+}
+
+/**
  * Helper function that draws several lines of text at once
  * @param x x-coord
  * @param y y-coord
